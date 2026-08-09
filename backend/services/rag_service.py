@@ -4,7 +4,7 @@ from typing import Dict, Any, List, Optional
 from utils.logger import logger
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CHROMA_PATH = os.path.join(BASE_DIR, "chroma_db")
+CHROMA_PATH = os.getenv("CHROMA_PATH", os.path.join(BASE_DIR, "chroma_db"))
 COLLECTION_NAME = "idea_executor_knowledge"
 
 

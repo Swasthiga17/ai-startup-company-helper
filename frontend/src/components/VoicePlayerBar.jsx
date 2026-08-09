@@ -28,15 +28,16 @@ export default function VoicePlayerBar({ textToRead, title = 'Page Narration' })
   const fetchGradiumVoice = async (pageName = 'dashboard') => {
     try {
       setIsGradiumLoading(true);
-      const res = await fetch('http://localhost:8000/get-voice-guidance', {
+      const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${apiBase}/get-voice-guidance`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ page: pageName.toLowerCase().replace(/\s+/g, '-'), text: textToRead })
       });
       const data = await res.json();
       if (data.audio_url) {
-        setGradiumAudioUrl(`http://localhost:8000${data.audio_url}`);
-        const audio = new Audio(`http://localhost:8000${data.audio_url}`);
+        setGradiumAudioUrl(`${apiBase}${data.audio_url}`);
+        const audio = new Audio(`${apiBase}${data.audio_url}`);
         audio.play();
       }
     } catch (err) {

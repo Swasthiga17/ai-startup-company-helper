@@ -1,5 +1,5 @@
 from typing import List, Dict, Any, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class BaseAgentResponseSchema(BaseModel):
@@ -13,18 +13,31 @@ class BaseAgentResponseSchema(BaseModel):
 
 
 class PersonaSchema(BaseModel):
-    name: str = Field(description="Name or title of target persona")
-    demographics: str = Field(description="Key demographics")
-    pain_point: str = Field(description="Primary pain point")
+    name: str = Field(default="Target User Persona", description="Name or title of target persona")
+    demographics: str = Field(default="Target Segment", description="Key demographics")
+    pain_point: str = Field(default="Primary pain point", description="Primary pain point")
 
 
 class IdeaAnalysisSchema(BaseAgentResponseSchema):
-    problem: str = Field(description="Clear problem statement")
+    problem: str = Field(default="Core customer problem statement", description="Clear problem statement")
     target_customers: List[str] = Field(default_factory=list, description="Target customer segments")
     pain_score: float = Field(default=8.5, description="Pain score out of 10")
     personas: List[PersonaSchema] = Field(default_factory=list, description="User personas")
-    value_proposition: str = Field(description="Core value proposition statement")
+    value_proposition: str = Field(default="Core value proposition statement", description="Core value proposition statement")
     validation_questions: List[str] = Field(default_factory=list, description="Key validation questions to ask")
+
+    @field_validator("personas", mode="before")
+    @classmethod
+    def coerce_personas(cls, v):
+        if isinstance(v, list):
+            res = []
+            for item in v:
+                if isinstance(item, str):
+                    res.append({"name": item, "demographics": "Target Segment", "pain_point": "Key pain point"})
+                elif isinstance(item, dict):
+                    res.append(item)
+            return res
+        return v
 
 
 class CompetitorItemSchema(BaseModel):
@@ -42,6 +55,19 @@ class MarketAnalysisSchema(BaseAgentResponseSchema):
     market_score: float = Field(default=8.5, description="Market score out of 10")
     competitors: List[CompetitorItemSchema] = Field(default_factory=list)
     trends: List[str] = Field(default_factory=list)
+
+    @field_validator("competitors", mode="before")
+    @classmethod
+    def coerce_competitors(cls, v):
+        if isinstance(v, list):
+            res = []
+            for item in v:
+                if isinstance(item, str):
+                    res.append({"name": item, "market_share": "15%", "strengths": [], "weaknesses": [], "competitive_advantage": "Key advantage"})
+                elif isinstance(item, dict):
+                    res.append(item)
+            return res
+        return v
 
 
 class BusinessAnalysisSchema(BaseAgentResponseSchema):
@@ -66,6 +92,19 @@ class ProductAnalysisSchema(BaseAgentResponseSchema):
     architecture: str = Field(default="Modular microservices / serverless API architecture")
     roadmap: List[MVPPhaseSchema] = Field(default_factory=list)
 
+    @field_validator("roadmap", mode="before")
+    @classmethod
+    def coerce_roadmap(cls, v):
+        if isinstance(v, list):
+            res = []
+            for item in v:
+                if isinstance(item, str):
+                    res.append({"phase": item, "title": item, "duration": "4 weeks", "tasks": []})
+                elif isinstance(item, dict):
+                    res.append(item)
+            return res
+        return v
+
 
 class RoleHiringSchema(BaseModel):
     role: str = Field(default="Engineering Lead", description="Role title")
@@ -81,6 +120,19 @@ class OperationsAnalysisSchema(BaseAgentResponseSchema):
     legal_checklist: List[str] = Field(default_factory=list)
     operational_risks: List[str] = Field(default_factory=list)
 
+    @field_validator("hiring_plan", mode="before")
+    @classmethod
+    def coerce_hiring_plan(cls, v):
+        if isinstance(v, list):
+            res = []
+            for item in v:
+                if isinstance(item, str):
+                    res.append({"role": item, "skills": "Required skills", "timeline": "Month 1-2", "salary_estimate": "$90K-$120K"})
+                elif isinstance(item, dict):
+                    res.append(item)
+            return res
+        return v
+
 
 class GrowthAnalysisSchema(BaseAgentResponseSchema):
     brand: Dict[str, Any] = Field(default_factory=dict)
@@ -92,7 +144,7 @@ class GrowthAnalysisSchema(BaseAgentResponseSchema):
 
 
 class MentorResponseSchema(BaseAgentResponseSchema):
-    answer: str = Field(description="Main mentor reply")
+    answer: str = Field(default="Mentor insight and advice for your startup idea.", description="Main mentor reply")
     score: Dict[str, Any] = Field(default_factory=dict)
     pitch: Dict[str, Any] = Field(default_factory=dict)
     action_items: List[str] = Field(default_factory=list)

@@ -1,5 +1,8 @@
-import logging
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+import logging
 import time
 import uuid
 from fastapi import FastAPI, Request, HTTPException
@@ -24,12 +27,38 @@ from routes.notifications import router as notifications_router
 from routes.action_items import router as action_items_router
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
 
 app = FastAPI(
     title="IdeaExecutor API",
     description="AI-powered startup operating system with multi-agent architecture",
     version="1.0.0",
+    lifespan=lifespan
+)
+
+cors_origins_env = os.environ.get("CORS_ORIGINS", "")
+if cors_origins_env:
+    allowed_origins = [origin.strip() for origin in cors_origins_env.split(",") if origin.strip()]
+else:
+    allowed_origins = [
+        "http://localhost:3000",
+        "http://localhost:3002",
+        "http://127.0.0.1:3002",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -141,26 +170,6 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 # Ensure static/audio folder exists and mount static directory
 os.makedirs("static/audio", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
-
-@app.on_event("startup")
-def _startup_init_db():
-    init_db()
-
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3002",
-        "http://127.0.0.1:3002",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Register sub-routers
 app.include_router(health_router)

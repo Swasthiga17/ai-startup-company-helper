@@ -1,6 +1,7 @@
 import time
 import json
-from typing import TypedDict, Dict, List, Any, Optional
+import operator
+from typing import TypedDict, Dict, List, Any, Optional, Annotated
 from langgraph.graph import StateGraph, START, END
 
 from agents.domain_agents import (
@@ -37,7 +38,7 @@ class StartupState(TypedDict, total=False):
     recommendations: List[str]
     action_items: List[str]
 
-    errors: List[Dict[str, Any]]
+    errors: Annotated[List[Dict[str, Any]], operator.add]
     execution_status: str  # STARTING, IDEA_COMPLETED, SYNTHESIZING, COMPLETED, PARTIAL_FAILURE, FAILED
     success: bool
 
@@ -86,21 +87,19 @@ def idea_node(state: StartupState) -> Dict[str, Any]:
             }
         else:
             logger.warning(f"[LangGraph] [Agent:Idea] Failed in {dt}s: {res.get('error')}")
-            err_list = state.get("errors", []) + [{"agent": "IdeaAgent", "error": res.get("error")}]
             return {
                 "idea_analysis": res,
                 "execution_status": "FAILED",
-                "errors": err_list
+                "errors": [{"agent": "IdeaAgent", "error": res.get("error")}]
             }
     except Exception as e:
         dt = round(time.time() - t0, 2)
         logger.error(f"[LangGraph] [Agent:Idea] Exception in {dt}s: {e}")
         err_res = {"success": False, "error": f"IdeaAgent failed: {str(e)}", "retryable": True}
-        err_list = state.get("errors", []) + [{"agent": "IdeaAgent", "error": str(e)}]
         return {
             "idea_analysis": err_res,
             "execution_status": "FAILED",
-            "errors": err_list
+            "errors": [{"agent": "IdeaAgent", "error": str(e)}]
         }
 
 
@@ -134,21 +133,17 @@ def market_node(state: StartupState) -> Dict[str, Any]:
             }
         else:
             logger.warning(f"[LangGraph] [Agent:Market] Failed in {dt}s: {res.get('error')}")
-            err_list = state.get("errors", []) + [{"agent": "MarketAgent", "error": res.get("error")}]
             return {
                 "market_analysis": res,
-                "execution_status": "PARTIAL_FAILURE",
-                "errors": err_list
+                "errors": [{"agent": "MarketAgent", "error": res.get("error")}]
             }
     except Exception as e:
         dt = round(time.time() - t0, 2)
         logger.error(f"[LangGraph] [Agent:Market] Exception in {dt}s: {e}")
         err_res = {"success": False, "error": f"MarketAgent failed: {str(e)}", "retryable": True}
-        err_list = state.get("errors", []) + [{"agent": "MarketAgent", "error": str(e)}]
         return {
             "market_analysis": err_res,
-            "execution_status": "PARTIAL_FAILURE",
-            "errors": err_list
+            "errors": [{"agent": "MarketAgent", "error": str(e)}]
         }
 
 
@@ -183,21 +178,17 @@ def business_node(state: StartupState) -> Dict[str, Any]:
             }
         else:
             logger.warning(f"[LangGraph] [Agent:Business] Failed in {dt}s: {res.get('error')}")
-            err_list = state.get("errors", []) + [{"agent": "BusinessAgent", "error": res.get("error")}]
             return {
                 "business_analysis": res,
-                "execution_status": "PARTIAL_FAILURE",
-                "errors": err_list
+                "errors": [{"agent": "BusinessAgent", "error": res.get("error")}]
             }
     except Exception as e:
         dt = round(time.time() - t0, 2)
         logger.error(f"[LangGraph] [Agent:Business] Exception in {dt}s: {e}")
         err_res = {"success": False, "error": f"BusinessAgent failed: {str(e)}", "retryable": True}
-        err_list = state.get("errors", []) + [{"agent": "BusinessAgent", "error": str(e)}]
         return {
             "business_analysis": err_res,
-            "execution_status": "PARTIAL_FAILURE",
-            "errors": err_list
+            "errors": [{"agent": "BusinessAgent", "error": str(e)}]
         }
 
 
@@ -221,21 +212,17 @@ def product_node(state: StartupState) -> Dict[str, Any]:
             }
         else:
             logger.warning(f"[LangGraph] [Agent:Product] Failed in {dt}s: {res.get('error')}")
-            err_list = state.get("errors", []) + [{"agent": "ProductAgent", "error": res.get("error")}]
             return {
                 "product_analysis": res,
-                "execution_status": "PARTIAL_FAILURE",
-                "errors": err_list
+                "errors": [{"agent": "ProductAgent", "error": res.get("error")}]
             }
     except Exception as e:
         dt = round(time.time() - t0, 2)
         logger.error(f"[LangGraph] [Agent:Product] Exception in {dt}s: {e}")
         err_res = {"success": False, "error": f"ProductAgent failed: {str(e)}", "retryable": True}
-        err_list = state.get("errors", []) + [{"agent": "ProductAgent", "error": str(e)}]
         return {
             "product_analysis": err_res,
-            "execution_status": "PARTIAL_FAILURE",
-            "errors": err_list
+            "errors": [{"agent": "ProductAgent", "error": str(e)}]
         }
 
 
@@ -258,21 +245,17 @@ def operations_node(state: StartupState) -> Dict[str, Any]:
             }
         else:
             logger.warning(f"[LangGraph] [Agent:Operations] Failed in {dt}s: {res.get('error')}")
-            err_list = state.get("errors", []) + [{"agent": "OperationsAgent", "error": res.get("error")}]
             return {
                 "operations_analysis": res,
-                "execution_status": "PARTIAL_FAILURE",
-                "errors": err_list
+                "errors": [{"agent": "OperationsAgent", "error": res.get("error")}]
             }
     except Exception as e:
         dt = round(time.time() - t0, 2)
         logger.error(f"[LangGraph] [Agent:Operations] Exception in {dt}s: {e}")
         err_res = {"success": False, "error": f"OperationsAgent failed: {str(e)}", "retryable": True}
-        err_list = state.get("errors", []) + [{"agent": "OperationsAgent", "error": str(e)}]
         return {
             "operations_analysis": err_res,
-            "execution_status": "PARTIAL_FAILURE",
-            "errors": err_list
+            "errors": [{"agent": "OperationsAgent", "error": str(e)}]
         }
 
 
@@ -297,21 +280,17 @@ def growth_node(state: StartupState) -> Dict[str, Any]:
             }
         else:
             logger.warning(f"[LangGraph] [Agent:Growth] Failed in {dt}s: {res.get('error')}")
-            err_list = state.get("errors", []) + [{"agent": "GrowthAgent", "error": res.get("error")}]
             return {
                 "growth_analysis": res,
-                "execution_status": "PARTIAL_FAILURE",
-                "errors": err_list
+                "errors": [{"agent": "GrowthAgent", "error": res.get("error")}]
             }
     except Exception as e:
         dt = round(time.time() - t0, 2)
         logger.error(f"[LangGraph] [Agent:Growth] Exception in {dt}s: {e}")
         err_res = {"success": False, "error": f"GrowthAgent failed: {str(e)}", "retryable": True}
-        err_list = state.get("errors", []) + [{"agent": "GrowthAgent", "error": str(e)}]
         return {
             "growth_analysis": err_res,
-            "execution_status": "PARTIAL_FAILURE",
-            "errors": err_list
+            "errors": [{"agent": "GrowthAgent", "error": str(e)}]
         }
 
 
@@ -393,22 +372,20 @@ def mentor_node(state: StartupState) -> Dict[str, Any]:
             }
         else:
             logger.warning(f"[LangGraph] [Agent:Mentor] Failed in {dt}s: {res.get('error')}")
-            err_list = state.get("errors", []) + [{"agent": "MentorAgent", "error": res.get("error")}]
             return {
                 "mentor_analysis": res,
                 "execution_status": "PARTIAL_FAILURE",
-                "errors": err_list,
+                "errors": [{"agent": "MentorAgent", "error": res.get("error")}],
                 "success": False
             }
     except Exception as e:
         dt = round(time.time() - t0, 2)
         logger.error(f"[LangGraph] [Agent:Mentor] Exception in {dt}s: {e}")
         err_res = {"success": False, "error": f"MentorAgent failed: {str(e)}", "retryable": True}
-        err_list = state.get("errors", []) + [{"agent": "MentorAgent", "error": str(e)}]
         return {
             "mentor_analysis": err_res,
             "execution_status": "PARTIAL_FAILURE",
-            "errors": err_list,
+            "errors": [{"agent": "MentorAgent", "error": str(e)}],
             "success": False
         }
 

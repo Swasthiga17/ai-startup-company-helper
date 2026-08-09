@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import re
 import traceback
 from typing import Optional, Dict, Any, Type, TypeVar
 from pydantic import BaseModel
@@ -17,7 +18,7 @@ from core.exceptions import (
 
 T = TypeVar("T", bound=BaseModel)
 
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
 
 
 class LLMService:
@@ -27,7 +28,7 @@ class LLMService:
         self.client = None
         self.available = False
         self.sdk_type = None  # "modern" or "legacy"
-        self.fallback_models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-pro"]
+        self.fallback_models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash-lite"]
         self._initialize()
 
     def _initialize(self):
@@ -36,11 +37,11 @@ class LLMService:
             self.available = False
             return
 
-        # 1. Try modern google-genai SDK (from google import genai)
         try:
             from google import genai
             client = genai.Client(api_key=self.api_key)
             model_candidates = [self.model_name] + [m for m in self.fallback_models if m != self.model_name]
+            model_candidates = list(dict.fromkeys(model_candidates))
             for candidate in model_candidates:
                 try:
                     res = client.models.generate_content(model=candidate, contents="Ping")
@@ -49,45 +50,19 @@ class LLMService:
                         self.model_name = candidate
                         self.available = True
                         self.sdk_type = "modern"
-                        logger.info(f"LLMService successfully initialized with modern google-genai SDK (model: {candidate})")
+                        logger.info(f"LLMService successfully initialized with google-genai SDK (model: {candidate})")
                         return
                 except Exception as candidate_err:
-                    logger.debug(f"Modern google-genai model candidate '{candidate}' failed init: {candidate_err}")
+                    logger.debug(f"google-genai model candidate '{candidate}' failed init: {candidate_err}")
                     continue
         except Exception as e:
-            logger.debug(f"Modern google-genai SDK init bypassed: {e}")
+            logger.error(f"Failed to initialize google-genai SDK: {e}")
 
-        # 2. Fallback to legacy google.generativeai SDK
-        try:
-            import google.generativeai as genai_legacy
-            genai_legacy.configure(api_key=self.api_key)
+        self.available = False
+        self.client = None
+        self.sdk_type = None
 
-            model_candidates = [self.model_name] + [m for m in self.fallback_models if m != self.model_name]
-            try:
-                available_models = [m.name.replace("models/", "") for m in genai_legacy.list_models() if "generateContent" in m.supported_generation_methods]
-                if available_models:
-                    model_candidates = available_models + model_candidates
-            except Exception as list_err:
-                logger.debug(f"List models check skipped: {list_err}")
-
-            for candidate in model_candidates:
-                try:
-                    test_model = genai_legacy.GenerativeModel(candidate)
-                    self.client = test_model
-                    self.model_name = candidate
-                    self.available = True
-                    self.sdk_type = "legacy"
-                    logger.info(f"LLMService successfully initialized with legacy google.generativeai SDK (model: {candidate})")
-                    return
-                except Exception as candidate_err:
-                    logger.debug(f"Legacy candidate model '{candidate}' failed init: {candidate_err}")
-                    continue
-        except Exception as e:
-            logger.error(f"Failed to initialize Gemini SDK: {e}")
-            self.available = False
-            self.sdk_type = None
-
-    def generate_text(self, prompt: str, temperature: float = 0.7, retries: int = 2, raise_exceptions: bool = False) -> Optional[str]:
+    def generate_text(self, prompt: str, temperature: float = 0.7, retries: int = 2, raise_exceptions: bool = False, response_mime_type: Optional[str] = None) -> Optional[str]:
         if not self.available or self.client is None:
             logger.warning("LLMService called but Gemini SDK is unconfigured.")
             if raise_exceptions:
@@ -96,6 +71,7 @@ class LLMService:
 
         start_time = time.time()
         models_to_try = [self.model_name] + [m for m in self.fallback_models if m != self.model_name]
+        models_to_try = list(dict.fromkeys(models_to_try))
 
         last_error = None
         total_retries = 0
@@ -105,21 +81,17 @@ class LLMService:
             while attempt < retries:
                 try:
                     text_result = None
-                    if self.sdk_type == "modern":
-                        response = self.client.models.generate_content(
-                            model=model_candidate,
-                            contents=prompt,
-                            config={"temperature": temperature}
-                        )
-                        if response and response.text:
-                            text_result = response.text.strip()
-                    else:
-                        import google.generativeai as genai_legacy
-                        client_model = genai_legacy.GenerativeModel(model_candidate)
-                        generation_config = {"temperature": temperature}
-                        response = client_model.generate_content(prompt, generation_config=generation_config)
-                        if response and response.text:
-                            text_result = response.text.strip()
+                    config = {"temperature": temperature}
+                    if response_mime_type:
+                        config["response_mime_type"] = response_mime_type
+
+                    response = self.client.models.generate_content(
+                        model=model_candidate,
+                        contents=prompt,
+                        config=config
+                    )
+                    if response and response.text:
+                        text_result = response.text.strip()
 
                     if text_result:
                         self.model_name = model_candidate
@@ -141,7 +113,7 @@ class LLMService:
                     total_retries += 1
                     err_str = str(e).lower()
                     last_error = e
-                    # Classify Gemini Errors securely without logging raw credentials
+                    logger.warning(f"LLM generate_text attempt {attempt + 1} with model {model_candidate} failed ({type(e).__name__}): {e}")
                     if "401" in err_str or "403" in err_str or "invalid api key" in err_str or "api_key_invalid" in err_str:
                         logger.error("Gemini Authentication Error: Invalid API key provided.")
                         if raise_exceptions:
@@ -151,11 +123,9 @@ class LLMService:
                         logger.warning(f"Rate limit hit on {model_candidate}, switching to next model candidate...")
                         break
                     elif "timeout" in err_str or "deadline" in err_str:
-                        logger.warning(f"Timeout on model {model_candidate}, attempt {attempt + 1}")
                         time.sleep(backoff)
                         backoff *= 1.5
                     else:
-                        logger.warning(f"LLM generate_text attempt {attempt + 1} with model {model_candidate} failed: {e}")
                         time.sleep(backoff)
                         backoff *= 1.5
                 attempt += 1
@@ -163,7 +133,7 @@ class LLMService:
         if raise_exceptions:
             if last_error and ("429" in str(last_error) or "quota" in str(last_error).lower()):
                 raise LLMRateLimitError()
-            raise LLMServiceError("All candidate LLM models failed to respond.")
+            raise LLMServiceError(f"All candidate LLM models failed to respond. Last error: {last_error}")
 
         return None
 
@@ -173,8 +143,15 @@ class LLMService:
         """
         json_prompt = f"{prompt}\n\nIMPORTANT: Return ONLY a valid JSON object matching the requested schema. Do not include markdown code fences, explanation text, or preambles."
 
-        raw_text = self.generate_text(json_prompt, temperature=temperature, retries=retries, raise_exceptions=raise_exceptions)
+        raw_text = self.generate_text(
+            json_prompt,
+            temperature=temperature,
+            retries=retries,
+            raise_exceptions=raise_exceptions,
+            response_mime_type="application/json"
+        )
         if not raw_text:
+            logger.warning("Empty raw_text received from generate_text in generate_json")
             if raise_exceptions:
                 raise LLMResponseParseError("Empty response received from LLM service.")
             return None
@@ -187,7 +164,7 @@ class LLMService:
                 return validated.model_dump()
             return parsed
         except Exception as parse_err:
-            logger.warning(f"JSON parsing/validation failed on first attempt: {parse_err}. Attempting repair...")
+            logger.warning(f"JSON parsing/validation failed on first attempt ({type(parse_err).__name__}: {parse_err}). Attempting repair...")
             repaired = self._repair_json(clean_text)
             if repaired:
                 try:
@@ -196,31 +173,53 @@ class LLMService:
                         validated = schema_cls.model_validate(parsed)
                         return validated.model_dump()
                     return parsed
-                except Exception:
-                    pass
+                except Exception as repair_err:
+                    logger.warning(f"Repaired JSON parsing failed: {repair_err}")
             logger.error(f"Unrecoverable JSON output: {clean_text[:200]}")
             if raise_exceptions:
-                raise LLMResponseParseError("Failed to parse or repair structured JSON output from LLM.")
+                raise LLMResponseParseError(f"Failed to parse or validate structured JSON output from LLM: {parse_err}")
             return None
 
     def _clean_json_text(self, text: str) -> str:
+        if not text:
+            return ""
         text = text.strip()
-        if text.startswith("```json"):
-            text = text[7:]
-        elif text.startswith("```"):
-            text = text[3:]
-        if text.endswith("```"):
-            text = text[:-3]
+
+        # 1. Look for ```json ... ``` or ``` ... ``` code blocks
+        if "```" in text:
+            parts = text.split("```")
+            for i in range(1, len(parts), 2):
+                block = parts[i].strip()
+                if block.startswith("json"):
+                    block = block[4:].strip()
+                if block.startswith("{") or block.startswith("["):
+                    return block
+
+        # 2. Extract substring between first '{' / '[' and last '}' / ']'
+        start_brace = text.find('{')
+        start_bracket = text.find('[')
+
+        if start_brace != -1 and (start_bracket == -1 or start_brace < start_bracket):
+            end_brace = text.rfind('}')
+            if end_brace > start_brace:
+                return text[start_brace:end_brace + 1]
+        elif start_bracket != -1:
+            end_bracket = text.rfind(']')
+            if end_bracket > start_bracket:
+                return text[start_bracket:end_bracket + 1]
+
         return text.strip()
 
     def _repair_json(self, text: str) -> Optional[str]:
-        try:
-            start_idx = text.find('{')
-            end_idx = text.rfind('}')
-            if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
-                return text[start_idx:end_idx + 1]
-        except Exception:
-            pass
+        if not text:
+            return None
+        start_brace = text.find('{')
+        end_brace = text.rfind('}')
+        if start_brace != -1 and end_brace > start_brace:
+            candidate = text[start_brace:end_brace + 1]
+            # Strip trailing commas before closing braces/brackets
+            candidate = re.sub(r',\s*([\}\]])', r'\1', candidate)
+            return candidate
         return None
 
 
