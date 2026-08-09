@@ -15,5 +15,9 @@ reportlab
 python-pptx
 python-jose[cryptography]
 passlib[bcrypt]
+bcrypt
+httpx
 pydantic
 pydantic-settings
+python-socketio
+

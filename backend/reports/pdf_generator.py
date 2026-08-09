@@ -29,15 +29,24 @@ def generate_pdf(data: dict, output_path: str) -> str:
             if isinstance(section_data, dict):
                 for key, value in section_data.items():
                     if isinstance(value, list):
-                        elements.append(Paragraph(f"<b>{key}:</b>", styles['Normal']))
+                        elements.append(Paragraph(f"<b>{key.replace('_', ' ').title()}:</b>", styles['Normal']))
                         for item in value:
-                            elements.append(Paragraph(f"• {item}", styles['Normal']))
+                            if isinstance(item, dict):
+                                details = []
+                                for k, v in item.items():
+                                    if isinstance(v, list):
+                                        details.append(f"<b>{k.replace('_', ' ').title()}:</b> {', '.join(map(str, v))}")
+                                    else:
+                                        details.append(f"<b>{k.replace('_', ' ').title()}:</b> {v}")
+                                elements.append(Paragraph(f"• {', '.join(details)}", styles['Normal']))
+                            else:
+                                elements.append(Paragraph(f"• {item}", styles['Normal']))
                     elif isinstance(value, dict):
-                        elements.append(Paragraph(f"<b>{key}:</b>", styles['Normal']))
+                        elements.append(Paragraph(f"<b>{key.replace('_', ' ').title()}:</b>", styles['Normal']))
                         for k, v in value.items():
-                            elements.append(Paragraph(f"  {k}: {v}", styles['Normal']))
+                            elements.append(Paragraph(f"  {k.replace('_', ' ').title()}: {v}", styles['Normal']))
                     else:
-                        elements.append(Paragraph(f"<b>{key}:</b> {value}", styles['Normal']))
+                        elements.append(Paragraph(f"<b>{key.replace('_', ' ').title()}:</b> {value}", styles['Normal']))
             elements.append(Spacer(1, 0.15 * inch))
     doc.build(elements)
     return output_path

@@ -1,15 +1,13 @@
 from agents.gemini_client import model, GEMINI_AVAILABLE
 from agents.utils import safe_json_parse
+from agents.domain_engine import get_idea_domain
 
 def competitor_analysis(idea: str) -> dict:
+    domain_data = get_idea_domain(idea)
+    fallback_data = {"competitors": domain_data["competitors"]}
+    
     if not GEMINI_AVAILABLE:
-        return {
-            "competitors": [
-                {"name": "Competitor A", "market_share": "25%", "strengths": ["Brand recognition"], "weaknesses": ["Legacy tech"], "competitive_advantage": "Low pricing"},
-                {"name": "Competitor B", "market_share": "18%", "strengths": ["Low pricing"], "weaknesses": ["Poor UX"], "competitive_advantage": "Market presence"},
-                {"name": "Competitor C", "market_share": "12%", "strengths": ["Innovation"], "weaknesses": ["Small scale"], "competitive_advantage": "Niche focus"}
-            ]
-        }
+        return fallback_data
     try:
         prompt = f"""
         Analyze potential competitors for: {idea}
@@ -28,12 +26,6 @@ def competitor_analysis(idea: str) -> dict:
         }}
         """
         response = model.generate_content(prompt, generation_config={"response_mime_type": "application/json"})
-        return safe_json_parse(response.text, {"competitors": []})
+        return safe_json_parse(response.text, fallback_data)
     except Exception:
-        return {
-            "competitors": [
-                {"name": "Competitor A", "market_share": "25%", "strengths": ["Brand recognition"], "weaknesses": ["Legacy tech"], "competitive_advantage": "Low pricing"},
-                {"name": "Competitor B", "market_share": "18%", "strengths": ["Low pricing"], "weaknesses": ["Poor UX"], "competitive_advantage": "Market presence"},
-                {"name": "Competitor C", "market_share": "12%", "strengths": ["Innovation"], "weaknesses": ["Small scale"], "competitive_advantage": "Niche focus"}
-            ]
-        }
+        return fallback_data

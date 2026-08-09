@@ -1,23 +1,20 @@
 import { motion } from 'framer-motion';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
-import ParticleBackground from './ParticleBackground';
 
 export default function Layout({ children, title }) {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] relative">
-      <ParticleBackground />
-      <div className="scanline" />
-      
+    <div className="min-h-screen relative bg-gradient-to-b from-[#FFF0F6] via-[#FCE7F3] to-[#FBCFE8] text-slate-800 font-sans">
       <div className="relative z-10 flex">
         <Sidebar />
-        <div className="flex-1 ml-72 min-h-screen">
+        <div className="flex-1 ml-80 min-h-screen">
           <TopBar title={title} />
-          <main className="p-6 grid-bg">
+          <main className="p-6 min-h-[calc(100vh-4rem)]">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
+              className="max-w-7xl mx-auto w-full"
             >
               {children}
             </motion.div>

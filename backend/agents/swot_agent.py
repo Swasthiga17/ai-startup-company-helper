@@ -1,14 +1,13 @@
 from agents.gemini_client import model, GEMINI_AVAILABLE
 from agents.utils import safe_json_parse
+from agents.domain_engine import get_idea_domain
 
 def swot_analysis(idea: str) -> dict:
+    domain_data = get_idea_domain(idea)
+    fallback_data = domain_data["swot"]
+    
     if not GEMINI_AVAILABLE:
-        return {
-            "strengths": ["Strong technical team", "Innovative product", "Low operational costs"],
-            "weaknesses": ["Limited brand recognition", "Small customer base", "Dependency on key personnel"],
-            "opportunities": ["Growing market demand", "Technology advancement", "Partnership potential"],
-            "threats": ["New market entrants", "Economic uncertainty", "Regulatory changes"]
-        }
+        return fallback_data
     try:
         prompt = f"""
         Perform SWOT analysis for: {idea}
@@ -22,11 +21,6 @@ def swot_analysis(idea: str) -> dict:
         }}
         """
         response = model.generate_content(prompt, generation_config={"response_mime_type": "application/json"})
-        return safe_json_parse(response.text, {})
+        return safe_json_parse(response.text, fallback_data)
     except Exception:
-        return {
-            "strengths": ["Strong technical team", "Innovative product", "Low operational costs"],
-            "weaknesses": ["Limited brand recognition", "Small customer base", "Dependency on key personnel"],
-            "opportunities": ["Growing market demand", "Technology advancement", "Partnership potential"],
-            "threats": ["New market entrants", "Economic uncertainty", "Regulatory changes"]
-        }
+        return fallback_data

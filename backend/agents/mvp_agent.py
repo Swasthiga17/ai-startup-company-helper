@@ -1,15 +1,13 @@
 from agents.gemini_client import model, GEMINI_AVAILABLE
 from agents.utils import safe_json_parse
+from agents.domain_engine import get_idea_domain
 
 def mvp_plan(idea: str) -> dict:
+    domain_data = get_idea_domain(idea)
+    fallback_data = {"phases": domain_data["mvp_phases"]}
+    
     if not GEMINI_AVAILABLE:
-        return {
-            "phases": [
-                {"phase": "Phase 1", "title": "Discovery & Planning", "duration": "4 weeks", "tasks": ["Market research", "User interviews", "Technical architecture"]},
-                {"phase": "Phase 2", "title": "MVP Development", "duration": "12 weeks", "tasks": ["Core features", "UI/UX design", "Backend setup"]},
-                {"phase": "Phase 3", "title": "Beta Launch", "duration": "8 weeks", "tasks": ["User testing", "Bug fixes", "Performance optimization"]}
-            ]
-        }
+        return fallback_data
     try:
         prompt = f"""
         Create an MVP roadmap for: {idea}
@@ -27,12 +25,6 @@ def mvp_plan(idea: str) -> dict:
         }}
         """
         response = model.generate_content(prompt, generation_config={"response_mime_type": "application/json"})
-        return safe_json_parse(response.text, {})
+        return safe_json_parse(response.text, fallback_data)
     except Exception:
-        return {
-            "phases": [
-                {"phase": "Phase 1", "title": "Discovery & Planning", "duration": "4 weeks", "tasks": ["Market research", "User interviews", "Technical architecture"]},
-                {"phase": "Phase 2", "title": "MVP Development", "duration": "12 weeks", "tasks": ["Core features", "UI/UX design", "Backend setup"]},
-                {"phase": "Phase 3", "title": "Beta Launch", "duration": "8 weeks", "tasks": ["User testing", "Bug fixes", "Performance optimization"]}
-            ]
-        }
+        return fallback_data

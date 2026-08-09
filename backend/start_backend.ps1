@@ -5,12 +5,9 @@ $ErrorActionPreference = 'Stop'
 
 Set-Location $PSScriptRoot
 
-# Prefer project venv
-if (Test-Path '.venv\Scripts\Activate.ps1') {
-  . .venv\Scripts\Activate.ps1
-} else {
-  Write-Host '[WARN] .venv\Scripts\Activate.ps1 not found. Using system Python.'
-}
+# Skip virtual env and use system Python
+Write-Host '[INFO] Using system Python.'
 
-python -m uvicorn app:app --reload --port 8000
+
+python -m uvicorn app:app --reload --host 0.0.0.0 --port 8000
 

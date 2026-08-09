@@ -1,0 +1,3 @@
+# constants.py - Project constants
+DEFAULT_PORT = 8000
+DEFAULT_HOST = "0.0.0.0"
