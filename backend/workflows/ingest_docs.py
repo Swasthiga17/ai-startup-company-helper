@@ -1,6 +1,6 @@
 import os
 from typing import List, Dict, Any, Optional
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from services.rag_service import ingest_document_chunks
 from utils.logger import logger
 
