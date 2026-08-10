@@ -54,7 +54,7 @@ decorator==5.2.1
 defusedxml==0.7.1
 dill==0.3.8
 distro==1.9.0
-dlib @ https://github.com/nmww/dlib/raw/main/dlib-19.22.99-cp39-cp39-win_amd64.whl#sha256=0fd828405c77af2df1ff6a09964a8ba7f14838c538d9017046804f353e9b4bc2
+dlib
 dnspython==2.7.0
 dotenv==0.9.9
 durationpy==0.10
