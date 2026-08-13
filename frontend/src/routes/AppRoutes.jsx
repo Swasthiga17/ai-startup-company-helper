@@ -35,19 +35,18 @@ import Pricing from '../pages/Pricing';
 import Notifications from '../pages/Notifications';
 import AdminPanel from '../pages/AdminPanel';
 import LaunchReadiness from '../pages/LaunchReadiness';
-import VoiceStudio from '../pages/VoiceStudio';
 import InvestorReadiness from '../pages/InvestorReadiness';
 import InvestorMode from '../pages/InvestorMode';
-import DevilsAdvocate from '../pages/DevilsAdvocate';
-import Simulators from '../pages/Simulators';
 import DocumentGenerator from '../pages/DocumentGenerator';
 import BrandCreation from '../pages/BrandCreation';
 import SalesStrategy from '../pages/SalesStrategy';
 import HiringPlan from '../pages/HiringPlan';
 import TechStack from '../pages/TechStack';
 import GrowthAdvisor from '../pages/GrowthAdvisor';
+import StartupCommandCenter from '../pages/StartupCommandCenter';
 
 const titles = {
+  '/command-center': 'Startup Command Center OS',
   '/dashboard': 'Executive Summary',
   '/problem-validation': 'Problem Validation',
   '/target-customers': 'Target Customers',
@@ -68,10 +67,7 @@ const titles = {
   '/chat': 'AI Mentor Chat',
   '/documents': 'Document Upload',
   '/workspace-hub': 'Workspace Hub',
-  '/devils-advocate': "Devil's Advocate & Pivots",
-  '/simulators': 'Roleplay Simulators',
   '/launch-readiness': 'Launch Readiness Dashboard',
-  '/voice-studio': 'AI Voice Studio & Voice Cloning',
   '/investor-readiness': 'Investor Readiness Score',
   '/investor-mode': 'Investor Mode & Funding Suite',
   '/brand-creation': 'Brand Creation & Identity',
@@ -94,56 +90,54 @@ export default function AppRoutes() {
     <>
       {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
       <Routes>
-      <Route path="/" element={<Marketing />} />
-      <Route path="/onboarding" element={<BuildSphereOnboarding />} />
-      <Route path="/showcase" element={<OnboardingShowcase />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Marketing />} />
+        <Route path="/onboarding" element={<BuildSphereOnboarding />} />
+        <Route path="/showcase" element={<OnboardingShowcase />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
 
-      <Route path="/input" element={<ProtectedRoute><InputPage /></ProtectedRoute>} />
-      <Route path="/dashboard" element={<ProtectedRoute><Layout title={titles['/dashboard']}><Dashboard /></Layout></ProtectedRoute>} />
-      <Route path="/impact" element={<ProtectedRoute><Layout title={titles['/impact']}><Impact /></Layout></ProtectedRoute>} />
-      <Route path="/market" element={<ProtectedRoute><Layout title={titles['/market']}><MarketAnalysis /></Layout></ProtectedRoute>} />
-      <Route path="/problem-validation" element={<ProtectedRoute><Layout title={titles['/problem-validation']}><ProblemValidation /></Layout></ProtectedRoute>} />
-      <Route path="/target-customers" element={<ProtectedRoute><Layout title={titles['/target-customers']}><TargetCustomers /></Layout></ProtectedRoute>} />
-      <Route path="/competitors" element={<ProtectedRoute><Layout title={titles['/competitors']}><CompetitorAnalysis /></Layout></ProtectedRoute>} />
-      <Route path="/value-prop" element={<ProtectedRoute><Layout title={titles['/value-prop']}><ValueProposition /></Layout></ProtectedRoute>} />
-      <Route path="/business-model" element={<ProtectedRoute><Layout title="Business Model"><BusinessModel /></Layout></ProtectedRoute>} />
-      <Route path="/revenue-model" element={<ProtectedRoute><Layout title={titles['/revenue-model']}><RevenueModel /></Layout></ProtectedRoute>} />
-      <Route path="/roadmap" element={<ProtectedRoute><Layout title={titles['/roadmap']}><Roadmap /></Layout></ProtectedRoute>} />
-      <Route path="/feature-planning" element={<ProtectedRoute><Layout title={titles['/feature-planning']}><FeaturePlanning /></Layout></ProtectedRoute>} />
-      <Route path="/gtm" element={<ProtectedRoute><Layout title={titles['/gtm']}><GoToMarket /></Layout></ProtectedRoute>} />
-      <Route path="/revenue" element={<ProtectedRoute><Layout title={titles['/revenue']}><RevenueForecast /></Layout></ProtectedRoute>} />
-      <Route path="/pitch-deck" element={<ProtectedRoute><Layout title={titles['/pitch-deck']}><PitchDeck /></Layout></ProtectedRoute>} />
-      <Route path="/legal" element={<ProtectedRoute><Layout title={titles['/legal']}><LegalChecklist /></Layout></ProtectedRoute>} />
-      <Route path="/swot" element={<ProtectedRoute><Layout title={titles['/swot']}><SWOTAnalysis /></Layout></ProtectedRoute>} />
-      <Route path="/ai-recommendations" element={<ProtectedRoute><Layout title={titles['/ai-recommendations']}><AIRecommendations /></Layout></ProtectedRoute>} />
-      <Route path="/documents" element={<ProtectedRoute><Layout title={titles['/documents']}><Documents /></Layout></ProtectedRoute>} />
-      <Route path="/chat" element={<ProtectedRoute><Layout title={titles['/chat']}><Chat /></Layout></ProtectedRoute>} />
+        <Route path="/input" element={<ProtectedRoute><InputPage /></ProtectedRoute>} />
+        <Route path="/command-center" element={<ProtectedRoute><Layout title={titles['/command-center']}><StartupCommandCenter /></Layout></ProtectedRoute>} />
+        <Route path="/dashboard" element={<ProtectedRoute><Layout title={titles['/dashboard']}><Dashboard /></Layout></ProtectedRoute>} />
+        <Route path="/impact" element={<ProtectedRoute><Layout title={titles['/impact']}><Impact /></Layout></ProtectedRoute>} />
+        <Route path="/market" element={<ProtectedRoute><Layout title={titles['/market']}><MarketAnalysis /></Layout></ProtectedRoute>} />
+        <Route path="/problem-validation" element={<ProtectedRoute><Layout title={titles['/problem-validation']}><ProblemValidation /></Layout></ProtectedRoute>} />
+        <Route path="/target-customers" element={<ProtectedRoute><Layout title={titles['/target-customers']}><TargetCustomers /></Layout></ProtectedRoute>} />
+        <Route path="/competitors" element={<ProtectedRoute><Layout title={titles['/competitors']}><CompetitorAnalysis /></Layout></ProtectedRoute>} />
+        <Route path="/value-prop" element={<ProtectedRoute><Layout title={titles['/value-prop']}><ValueProposition /></Layout></ProtectedRoute>} />
+        <Route path="/business-model" element={<ProtectedRoute><Layout title="Business Model"><BusinessModel /></Layout></ProtectedRoute>} />
+        <Route path="/revenue-model" element={<ProtectedRoute><Layout title={titles['/revenue-model']}><RevenueModel /></Layout></ProtectedRoute>} />
+        <Route path="/roadmap" element={<ProtectedRoute><Layout title={titles['/roadmap']}><Roadmap /></Layout></ProtectedRoute>} />
+        <Route path="/feature-planning" element={<ProtectedRoute><Layout title={titles['/feature-planning']}><FeaturePlanning /></Layout></ProtectedRoute>} />
+        <Route path="/gtm" element={<ProtectedRoute><Layout title={titles['/gtm']}><GoToMarket /></Layout></ProtectedRoute>} />
+        <Route path="/revenue" element={<ProtectedRoute><Layout title={titles['/revenue']}><RevenueForecast /></Layout></ProtectedRoute>} />
+        <Route path="/pitch-deck" element={<ProtectedRoute><Layout title={titles['/pitch-deck']}><PitchDeck /></Layout></ProtectedRoute>} />
+        <Route path="/legal" element={<ProtectedRoute><Layout title={titles['/legal']}><LegalChecklist /></Layout></ProtectedRoute>} />
+        <Route path="/swot" element={<ProtectedRoute><Layout title={titles['/swot']}><SWOTAnalysis /></Layout></ProtectedRoute>} />
+        <Route path="/ai-recommendations" element={<ProtectedRoute><Layout title={titles['/ai-recommendations']}><AIRecommendations /></Layout></ProtectedRoute>} />
+        <Route path="/documents" element={<ProtectedRoute><Layout title={titles['/documents']}><Documents /></Layout></ProtectedRoute>} />
+        <Route path="/chat" element={<ProtectedRoute><Layout title={titles['/chat']}><Chat /></Layout></ProtectedRoute>} />
 
-      {/* New 25 Pilot Feature Routes */}
-      <Route path="/brand-creation" element={<ProtectedRoute><Layout title={titles['/brand-creation']}><BrandCreation /></Layout></ProtectedRoute>} />
-      <Route path="/sales-strategy" element={<ProtectedRoute><Layout title={titles['/sales-strategy']}><SalesStrategy /></Layout></ProtectedRoute>} />
-      <Route path="/hiring-plan" element={<ProtectedRoute><Layout title={titles['/hiring-plan']}><HiringPlan /></Layout></ProtectedRoute>} />
-      <Route path="/tech-stack" element={<ProtectedRoute><Layout title={titles['/tech-stack']}><TechStack /></Layout></ProtectedRoute>} />
-      <Route path="/growth-advisor" element={<ProtectedRoute><Layout title={titles['/growth-advisor']}><GrowthAdvisor /></Layout></ProtectedRoute>} />
-      <Route path="/devils-advocate" element={<ProtectedRoute><Layout title={titles['/devils-advocate']}><DevilsAdvocate /></Layout></ProtectedRoute>} />
-      <Route path="/simulators" element={<ProtectedRoute><Layout title={titles['/simulators']}><Simulators /></Layout></ProtectedRoute>} />
-      <Route path="/document-generator" element={<ProtectedRoute><Layout title={titles['/document-generator']}><DocumentGenerator /></Layout></ProtectedRoute>} />
-      <Route path="/investor-mode" element={<ProtectedRoute><Layout title={titles['/investor-mode']}><InvestorMode /></Layout></ProtectedRoute>} />
+        {/* New 25 Pilot Feature Routes */}
+        <Route path="/brand-creation" element={<ProtectedRoute><Layout title={titles['/brand-creation']}><BrandCreation /></Layout></ProtectedRoute>} />
+        <Route path="/sales-strategy" element={<ProtectedRoute><Layout title={titles['/sales-strategy']}><SalesStrategy /></Layout></ProtectedRoute>} />
+        <Route path="/hiring-plan" element={<ProtectedRoute><Layout title={titles['/hiring-plan']}><HiringPlan /></Layout></ProtectedRoute>} />
+        <Route path="/tech-stack" element={<ProtectedRoute><Layout title={titles['/tech-stack']}><TechStack /></Layout></ProtectedRoute>} />
+        <Route path="/growth-advisor" element={<ProtectedRoute><Layout title={titles['/growth-advisor']}><GrowthAdvisor /></Layout></ProtectedRoute>} />
+        <Route path="/document-generator" element={<ProtectedRoute><Layout title={titles['/document-generator']}><DocumentGenerator /></Layout></ProtectedRoute>} />
+        <Route path="/investor-mode" element={<ProtectedRoute><Layout title={titles['/investor-mode']}><InvestorMode /></Layout></ProtectedRoute>} />
 
-      {/* Premium Route bindings */}
-      <Route path="/voice-studio" element={<ProtectedRoute><Layout title={titles['/voice-studio']}><VoiceStudio /></Layout></ProtectedRoute>} />
-      <Route path="/workspace" element={<ProtectedRoute><Layout title="Workspace"><Workspace /></Layout></ProtectedRoute>} />
-      <Route path="/workspace-hub" element={<ProtectedRoute><Layout title={titles['/workspace-hub']}><WorkspaceHub /></Layout></ProtectedRoute>} />
-      <Route path="/investor-readiness" element={<ProtectedRoute><Layout title={titles['/investor-readiness']}><InvestorReadiness /></Layout></ProtectedRoute>} />
-      <Route path="/pricing" element={<ProtectedRoute><Layout title="Pricing Plans"><Pricing /></Layout></ProtectedRoute>} />
-      <Route path="/notifications" element={<ProtectedRoute><Layout title="Notifications"><Notifications /></Layout></ProtectedRoute>} />
-      <Route path="/admin" element={<ProtectedRoute><Layout title="Admin Panel"><AdminPanel /></Layout></ProtectedRoute>} />
-      <Route path="/launch-readiness" element={<ProtectedRoute><Layout title={titles['/launch-readiness']}><LaunchReadiness /></Layout></ProtectedRoute>} />
+        {/* Premium Route bindings */}
+        <Route path="/workspace" element={<ProtectedRoute><Layout title="Workspace"><Workspace /></Layout></ProtectedRoute>} />
+        <Route path="/workspace-hub" element={<ProtectedRoute><Layout title={titles['/workspace-hub']}><WorkspaceHub /></Layout></ProtectedRoute>} />
+        <Route path="/investor-readiness" element={<ProtectedRoute><Layout title={titles['/investor-readiness']}><InvestorReadiness /></Layout></ProtectedRoute>} />
+        <Route path="/pricing" element={<ProtectedRoute><Layout title="Pricing Plans"><Pricing /></Layout></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute><Layout title="Notifications"><Notifications /></Layout></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><Layout title="Admin Panel"><AdminPanel /></Layout></ProtectedRoute>} />
+        <Route path="/launch-readiness" element={<ProtectedRoute><Layout title={titles['/launch-readiness']}><LaunchReadiness /></Layout></ProtectedRoute>} />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  </>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }

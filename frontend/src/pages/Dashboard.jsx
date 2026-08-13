@@ -730,9 +730,9 @@ export default function Dashboard() {
 
           <div className="space-y-2">
             <h1 className="text-3xl font-black text-slate-800 tracking-tight">
-              <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">startupGenie</span>
+              <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">IdeaExecutor</span>
             </h1>
-            <p className="text-xs text-slate-450 font-bold uppercase tracking-wider">Your AI Startup Genie — Validate, Analyze, and Fund Your Startup Vision</p>
+            <p className="text-xs text-slate-450 font-bold uppercase tracking-wider">Your AI Startup Assistant — Validate, Analyze, and Build Your Startup Vision</p>
           </div>
 
           {/* Prompt Input Box */}
@@ -791,8 +791,8 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center gap-2 mb-1.5">
               <Rocket className="w-5 h-5 text-violet-500 animate-pulse" />
-              <h2 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-pink-500 bg-clip-text text-transparent">startupGenie</h2>
-              <span className="text-[9px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-100 font-extrabold uppercase tracking-wider">AI GENIE</span>
+              <h2 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-pink-500 bg-clip-text text-transparent">IdeaExecutor</h2>
+              <span className="text-[9px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-100 font-extrabold uppercase tracking-wider">AI ENGINE</span>
             </div>
             <p className="text-xs text-slate-450 font-semibold">Analysis for: <span className="text-slate-800 font-bold">"{analysis.idea?.substring(0, 50)}"</span></p>
           </div>

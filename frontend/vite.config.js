@@ -22,12 +22,8 @@ export default defineConfig({
       '/upload-document': { target: BACKEND, changeOrigin: true },
       // AI document generator
       '/ai': { target: BACKEND, changeOrigin: true },
-      // Simulator routes
-      '/simulator': { target: BACKEND, changeOrigin: true },
-      '/devils-advocate': { target: BACKEND, changeOrigin: true },
-      '/execution-score': { target: BACKEND, changeOrigin: true },
-      // Admin
-      '/admin': { target: BACKEND, changeOrigin: true },
+      // Startup Operating System
+      '/startup': { target: BACKEND, changeOrigin: true },
     },
   },
 })

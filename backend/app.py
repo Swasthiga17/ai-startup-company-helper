@@ -14,6 +14,7 @@ import socketio
 
 from database import init_db
 from core.exceptions import IdeaExecutorError
+from utils.logger import logger
 from routes.auth import router as auth_router
 from routes.analyze import router as analyze_router
 from routes.documents import router as documents_router
@@ -25,6 +26,8 @@ from routes.health import router as health_router
 from routes.workspace import router as workspace_router
 from routes.notifications import router as notifications_router
 from routes.action_items import router as action_items_router
+from routes.startup import router as startup_router
+from routes.intelligence import router as intelligence_router
 
 logging.basicConfig(level=logging.INFO)
 from contextlib import asynccontextmanager
@@ -183,6 +186,8 @@ app.include_router(voice_router)
 app.include_router(workspace_router)
 app.include_router(notifications_router)
 app.include_router(action_items_router)
+app.include_router(startup_router)
+app.include_router(intelligence_router)
 
 
 from socket_server import sio

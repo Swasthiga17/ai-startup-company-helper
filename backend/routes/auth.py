@@ -135,34 +135,48 @@ async def forgot_password(req: ForgotPasswordRequest):
 
 
 class GoogleAuthRequest(BaseModel):
-    access_token: str
+    access_token: Optional[str] = None
+    credential: Optional[str] = None
 
 
 @router.post("/google", response_model=TokenResponse)
 async def google_auth(req: GoogleAuthRequest, db: Session = Depends(get_db)):
     """
-    Verify a Google OAuth access token, then find or create the user and
-    return an application JWT.
+    Verify a Google OAuth access token or ID token (credential), then find or create
+    the user and return an application JWT.
     """
     import httpx
 
-    # Fetch the Google user profile using the access token
+    if not req.access_token and not req.credential:
+        raise HTTPException(status_code=400, detail="Either access_token or credential (ID token) must be provided.")
+
+    profile = {}
     try:
         async with httpx.AsyncClient() as client:
-            resp = await client.get(
-                "https://www.googleapis.com/oauth2/v3/userinfo",
-                headers={"Authorization": f"Bearer {req.access_token}"},
-                timeout=10,
-            )
+            if req.access_token:
+                resp = await client.get(
+                    "https://www.googleapis.com/oauth2/v3/userinfo",
+                    headers={"Authorization": f"Bearer {req.access_token}"},
+                    timeout=10,
+                )
+                if resp.status_code != 200:
+                    raise HTTPException(status_code=401, detail="Invalid Google access token. Please sign in with Google again.")
+                profile = resp.json()
+            elif req.credential:
+                resp = await client.get(
+                    f"https://oauth2.googleapis.com/tokeninfo?id_token={req.credential}",
+                    timeout=10,
+                )
+                if resp.status_code != 200:
+                    raise HTTPException(status_code=401, detail="Invalid Google ID token. Please sign in with Google again.")
+                profile = resp.json()
+    except HTTPException:
+        raise
     except Exception:
         raise HTTPException(status_code=503, detail="Could not reach Google servers. Check your connection.")
 
-    if resp.status_code != 200:
-        raise HTTPException(status_code=401, detail="Invalid Google token. Please sign in with Google again.")
-
-    profile = resp.json()
     google_email: str = profile.get("email", "").lower()
-    google_name: str = profile.get("name") or profile.get("given_name") or google_email.split("@")[0]
+    google_name: str = profile.get("name") or profile.get("given_name") or google_email.split("@")[0] if google_email else ""
 
     if not google_email:
         raise HTTPException(status_code=400, detail="Google account has no email address.")

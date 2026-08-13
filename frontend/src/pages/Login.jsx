@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, Lock, Eye, EyeOff, ArrowRight, Lightbulb, Target, TrendingUp } from 'lucide-react';
+import { useGoogleLogin } from '@react-oauth/google';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -9,6 +10,40 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
+  const handleGoogleSuccess = async (tokenResponse) => {
+    setError('');
+    try {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL || ''}/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ access_token: tokenResponse.access_token }),
+      });
+      let data = {};
+      try { data = await resp.json(); } catch {}
+      if (!resp.ok) throw new Error(data?.detail || 'Google login failed on backend');
+
+      localStorage.setItem('token', data.access_token);
+      navigate('/onboarding');
+    } catch (err) {
+      setError(err?.message || 'Google authentication failed');
+    }
+  };
+
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => setError('Google sign-in was cancelled or failed.'),
+  });
+
+  const triggerGoogleLogin = () => {
+    if (!googleClientId) {
+      setError('Google Login Client ID is missing. Please set VITE_GOOGLE_CLIENT_ID in your environment.');
+      return;
+    }
+    loginWithGoogle();
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -215,7 +250,7 @@ export default function Login() {
           {/* Google Button */}
           <button
             type="button"
-            onClick={() => alert('Google authentication login configured.')}
+            onClick={triggerGoogleLogin}
             className="w-full py-3 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 text-xs font-bold rounded-full flex items-center justify-center gap-3 shadow-sm hover:shadow transition cursor-pointer relative z-10"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">

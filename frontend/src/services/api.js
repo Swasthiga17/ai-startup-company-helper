@@ -101,28 +101,8 @@ export async function getAdminStats() {
   return response.data;
 }
 
-export async function getDevilsAdvocate(idea) {
-  const response = await api.post('/devils-advocate', { idea });
-  return response.data;
-}
-
 export async function getExecutionScore(idea, team_skills, budget, timeline) {
   const response = await api.post('/execution-score', { idea, team_skills, budget, timeline });
-  return response.data;
-}
-
-export async function sendSimulatorChat(idea, simulator_type, persona, message, chat_history) {
-  const response = await api.post('/simulator/chat', { idea, simulator_type, persona, message, chat_history });
-  return response.data;
-}
-
-export async function evaluateSimulator(idea, simulator_type, persona, chat_history) {
-  const response = await api.post('/simulator/evaluate', { idea, simulator_type, persona, chat_history });
-  return response.data;
-}
-
-export async function evaluateScenario(idea, params = {}) {
-  const response = await api.post('/simulator/evaluate-scenario', { idea, ...params });
   return response.data;
 }
 

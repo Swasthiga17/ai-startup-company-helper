@@ -1401,14 +1401,14 @@ export default function InputPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#BAE6FD] via-[#E0F4FF] to-[#FDE8F3] text-slate-800 flex flex-col justify-between relative overflow-x-hidden font-sans select-none p-6 md:p-10">
+    <div className="min-h-screen bg-gradient-to-br from-[#BAE6FD] via-[#E0F4FF] to-[#FDE8F3] text-slate-800 flex flex-col justify-start relative overflow-x-hidden font-sans select-none p-4 md:p-6">
       {/* Background Animated Glows */}
       <div className="absolute top-0 left-0 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,rgba(14,165,233,0.15)_0%,transparent_70%)] pointer-events-none" />
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-pink-400/10 rounded-full blur-[140px] pointer-events-none animate-pulse" />
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(14,165,233,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(14,165,233,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
       {/* Header Bar */}
-      <header className="w-full max-w-7xl mx-auto flex items-center justify-between z-20 pb-6 border-b border-[#0EA5E9]/10">
+      <header className="w-full max-w-7xl mx-auto flex items-center justify-between z-20 pb-4 border-b border-[#0EA5E9]/10">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
           <img src="/ideaexecutor_icon.png" alt="IdeaExecutor Logo" className="w-10 h-10 object-contain drop-shadow-md" />
           <div>
@@ -1440,13 +1440,13 @@ export default function InputPage() {
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl w-full mx-auto my-8 relative z-10 space-y-10">
+      <main className="max-w-7xl w-full mx-auto my-4 relative z-10 space-y-6">
 
         {/* ─── VIEW 1: WELCOME DASHBOARD ─── */}
         {activeTab === 'dashboard' && (
-          <div className="space-y-10">
+          <div className="space-y-6">
             {/* Hero Banner */}
-            <div className="bg-white/75 backdrop-blur-2xl rounded-3xl p-8 border border-white/90 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 text-left">
+            <div className="bg-white/75 backdrop-blur-2xl rounded-3xl p-6 border border-white/90 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 text-left">
               <div className="space-y-4 max-w-xl">
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#F43F8A]/10 border border-[#F43F8A]/30 rounded-full text-[10px] font-bold uppercase tracking-widest text-[#F43F8A]">
                   <Sparkles className="w-3.5 h-3.5 text-yellow-500 animate-pulse" />

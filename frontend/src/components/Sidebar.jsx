@@ -15,7 +15,6 @@ import {
   Zap,
   ChevronRight,
   Sparkles,
-  Mic,
   LogOut,
   Trello,
   Flame,
@@ -24,9 +23,7 @@ import {
   DollarSign,
   Compass,
   Tag,
-  ShieldAlert,
   Users2,
-  Play,
   Award,
   Globe,
   Shield,
@@ -38,7 +35,8 @@ const groups = [
   {
     title: 'EXECUTIVE',
     links: [
-      { path: '/dashboard', icon: Home, label: 'Dashboard Overview' },
+      { path: '/command-center', icon: Sparkles, label: 'Startup Command Center' },
+      { path: '/dashboard', icon: Home, label: 'Executive Summary' },
       { path: '/onboarding', icon: Compass, label: 'Product Onboarding' },
     ]
   },
@@ -89,7 +87,6 @@ const groups = [
     links: [
       { path: '/hiring-plan', icon: Users2, label: 'Hiring Plan' },
       { path: '/legal', icon: Shield, label: 'Legal Guidance' },
-      { path: '/devils-advocate', icon: ShieldAlert, label: "Devil's Advocate" },
     ]
   },
   {
@@ -105,8 +102,6 @@ const groups = [
     title: 'AI CO-FOUNDER',
     links: [
       { path: '/chat', icon: MessageSquare, label: 'AI Mentor Chat' },
-      { path: '/simulators', icon: Play, label: 'Roleplay & Simulator' },
-      { path: '/voice-studio', icon: Mic, label: 'Voice Studio' },
     ]
   },
   {
@@ -160,25 +155,25 @@ function RobotMascot() {
         {/* Antenna */}
         <line x1="50" y1="18" x2="50" y2="8" stroke="#EC4899" strokeWidth="4" strokeLinecap="round" />
         <circle cx="50" cy="6" r="4" fill="#38BDF8" className="animate-pulse" />
-        
+
         {/* Body Base */}
         <ellipse cx="50" cy="78" rx="26" ry="16" fill="url(#botGrad)" />
-        
+
         {/* Head */}
         <rect x="22" y="18" width="56" height="46" rx="20" fill="url(#headGrad)" stroke="#FFFFFF" strokeWidth="2.5" />
-        
+
         {/* Screen/Face */}
         <rect x="28" y="24" width="44" height="34" rx="14" fill="#1E1B4B" />
-        
+
         {/* Eyes */}
         <ellipse cx="40" cy="40" rx="5" ry="6" fill="url(#eyeGlow)" />
         <ellipse cx="60" cy="40" rx="5" ry="6" fill="url(#eyeGlow)" />
         <circle cx="42" cy="38" r="1.5" fill="#FFFFFF" />
         <circle cx="62" cy="38" r="1.5" fill="#FFFFFF" />
-        
+
         {/* Cute Smile */}
         <path d="M 44 48 Q 50 53 56 48" fill="none" stroke="#38BDF8" strokeWidth="2" strokeLinecap="round" />
-        
+
         {/* Headphones / Ears */}
         <rect x="16" y="30" width="8" height="22" rx="4" fill="#EC4899" />
         <rect x="76" y="30" width="8" height="22" rx="4" fill="#EC4899" />
@@ -269,11 +264,10 @@ export default function Sidebar() {
                   whileHover={{ x: 3, scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                   onClick={() => navigate(path)}
-                  className={`w-full flex items-center justify-between px-4.5 py-4 rounded-xl text-base font-black transition-all duration-200 relative group cursor-pointer ${
-                    active
-                      ? 'bg-gradient-to-r from-[#e60067] via-[#ee2b7b] to-[#ff4e85] text-white shadow-lg shadow-pink-600/35'
-                      : 'text-pink-100/90 hover:text-white hover:bg-white/10'
-                  }`}
+                  className={`w-full flex items-center justify-between px-4.5 py-4 rounded-xl text-base font-black transition-all duration-200 relative group cursor-pointer ${active
+                    ? 'bg-gradient-to-r from-[#e60067] via-[#ee2b7b] to-[#ff4e85] text-white shadow-lg shadow-pink-600/35'
+                    : 'text-pink-100/90 hover:text-white hover:bg-white/10'
+                    }`}
                 >
                   <div className="flex items-center gap-4">
                     <Icon className={`w-6 h-6 transition-colors ${active ? 'text-white' : 'text-pink-200 group-hover:text-white'}`} />
@@ -333,4 +327,4 @@ export default function Sidebar() {
       </div>
     </motion.aside>
   );
-}
+}

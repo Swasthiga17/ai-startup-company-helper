@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useApp } from '../context/AppContext';
-import { 
-  Cpu, Layout, Server, Database, Key, Cloud, 
-  Bot, CreditCard, Terminal, CheckCircle 
+import {
+  Cpu, Layout, Server, Database, Key, Cloud,
+  Bot, CreditCard, Terminal, CheckCircle
 } from 'lucide-react';
 
 const container = {
@@ -43,7 +43,7 @@ export default function TechStack() {
 
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6 text-left pb-12">
-      
+
       {/* Header */}
       <motion.div variants={item} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -62,9 +62,9 @@ export default function TechStack() {
         {categories.map((cat, idx) => {
           const IconComp = cat.icon;
           return (
-            <motion.div 
-              key={idx} 
-              variants={item} 
+            <motion.div
+              key={idx}
+              variants={item}
               className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
             >
               <div>
@@ -107,7 +107,7 @@ export default function TechStack() {
           </div>
 
           <pre className="text-xs font-mono text-slate-300 bg-slate-950 p-4 rounded-2xl overflow-x-auto border border-slate-800/80 leading-relaxed max-h-72">
-{analysis?.db_schema?.sql || `-- Database Schema for Startup Platform
+            {analysis?.db_schema?.sql || `-- Database Schema for Startup Platform
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   email VARCHAR(255) UNIQUE NOT NULL,
@@ -148,14 +148,12 @@ CREATE TABLE analyses (
             {(analysis?.api_planner || [
               { method: 'POST', endpoint: '/api/v1/auth/login', description: 'Authenticate user & issue JWT token' },
               { method: 'POST', endpoint: '/api/v1/analyze', description: 'Run multi-agent AI execution pipeline' },
-              { method: 'GET', endpoint: '/api/v1/workspaces', description: 'Retrieve active founder startup projects' },
-              { method: 'POST', endpoint: '/api/v1/simulator/chat', description: 'Interactive YC/VC pitch roleplay simulator' }
+              { method: 'GET', endpoint: '/api/v1/workspaces', description: 'Retrieve active founder startup projects' }
             ]).map((api, idx) => (
               <div key={idx} className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded ${
-                    api.method === 'POST' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'
-                  }`}>
+                  <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded ${api.method === 'POST' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'
+                    }`}>
                     {api.method}
                   </span>
                   <code className="text-xs font-mono font-bold text-slate-800">{api.endpoint}</code>

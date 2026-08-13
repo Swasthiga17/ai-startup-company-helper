@@ -43,6 +43,8 @@ def migrate_action_items_table():
 def init_db():
     # Ensure all models are imported so their tables register with Base.metadata
     import models.auth_models  # noqa: F401 — registers User, Analysis, Document, ActionItem, PasswordResetToken
+    import models.startup_models  # noqa: F401 — registers StartupProfile, StartupGoal, StartupTask, StartupSignal
+    import models.briefing_models  # noqa: F401 — registers DailyBriefing, AIRecommendationModel
     Base.metadata.create_all(bind=engine)
     migrate_action_items_table()
 

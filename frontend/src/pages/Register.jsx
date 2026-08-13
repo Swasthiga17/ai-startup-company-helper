@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, Mail, Lock, Eye, EyeOff, Building, Globe, Briefcase, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
+import { useGoogleLogin } from '@react-oauth/google';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -16,6 +17,40 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agree, setAgree] = useState(false);
   const [error, setError] = useState('');
+
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
+  const handleGoogleSuccess = async (tokenResponse) => {
+    setError('');
+    try {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL || ''}/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ access_token: tokenResponse.access_token }),
+      });
+      let data = {};
+      try { data = await resp.json(); } catch {}
+      if (!resp.ok) throw new Error(data?.detail || 'Google registration failed on backend');
+
+      localStorage.setItem('token', data.access_token);
+      navigate('/onboarding');
+    } catch (err) {
+      setError(err?.message || 'Google authentication failed');
+    }
+  };
+
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => setError('Google sign-in was cancelled or failed.'),
+  });
+
+  const triggerGoogleLogin = () => {
+    if (!googleClientId) {
+      setError('Google Login Client ID is missing. Please set VITE_GOOGLE_CLIENT_ID in your environment.');
+      return;
+    }
+    loginWithGoogle();
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -351,7 +386,7 @@ export default function Register() {
           <div className="grid grid-cols-3 gap-2.5 relative z-10">
             <button
               type="button"
-              onClick={() => alert('Google authentication login configured.')}
+              onClick={triggerGoogleLogin}
               className="py-2.5 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 text-xs font-bold rounded-full flex items-center justify-center gap-2 shadow-sm hover:shadow transition cursor-pointer"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">

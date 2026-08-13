@@ -10,3 +10,12 @@ __pycache__/
 node_modules/
 dist/
 frontend/dist/
+frontend/.git_disabled/
+backend/chroma_db/
+backend/startup.db
+startup.db
+backend/output/
+backend/uploads/
+backend/startup_docs/
+backend/static/audio/
+*.log
