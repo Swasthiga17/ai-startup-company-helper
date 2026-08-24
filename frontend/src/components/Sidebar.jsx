@@ -40,7 +40,6 @@ const groups = [
     title: 'EXECUTIVE',
     links: [
       { path: '/dashboard', icon: Home, label: 'Dashboard Overview' },
-      { path: '/onboarding', icon: Compass, label: 'Product Onboarding' },
     ]
   },
   {
