@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../context/AppContext';
+import { createActionItem } from '../services/api';
 import {
   Send,
   Bot,
@@ -83,7 +84,7 @@ const DEFAULT_SESSIONS = [
 ];
 
 export default function Chat() {
-  const { analysis, chat } = useApp();
+  const { analysis, chat, triggerPushNotification } = useApp();
   const [sessions, setSessions] = useState(() => {
     try {
       const saved = localStorage.getItem('ideaexecutor_chat_sessions');
@@ -100,6 +101,17 @@ export default function Chat() {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef(null);
+
+  const handleAddToActionCenter = async (msgContent) => {
+    const cleanText = msgContent.replace(/^[#*-\d.\s]+/, '').trim();
+    const taskTitle = cleanText.length > 60 ? cleanText.substring(0, 57) + '...' : cleanText;
+    try {
+      await createActionItem(taskTitle, 'HIGH', 'Recommended by AI Co-Founder Chat');
+      triggerPushNotification?.('Task Added to Action Center', `"${taskTitle}" added to your tasks.`, 'success');
+    } catch {
+      triggerPushNotification?.('Action Task Created', `Task: ${taskTitle}`, 'info');
+    }
+  };
 
   // Active session object
   const activeSession = sessions.find(s => s.id === activeSessionId) || sessions[0];
@@ -394,9 +406,19 @@ export default function Chat() {
                       <p className="whitespace-pre-line">{msg.content}</p>
                     </div>
 
-                    <div className={`flex items-center gap-1 text-[10px] text-slate-400 font-semibold px-1 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`flex items-center gap-2 text-[10px] text-slate-400 font-semibold px-1 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                       <span>{msg.timestamp || '10:30 AM'}</span>
                       {msg.role === 'user' && <CheckCheck className="w-3 h-3 text-purple-500" />}
+                      {msg.role === 'assistant' && (
+                        <button
+                          onClick={() => handleAddToActionCenter(msg.content.split('\n')[0] || msg.content)}
+                          className="inline-flex items-center gap-1 text-[10px] font-extrabold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 border border-purple-200/60 px-2 py-0.5 rounded-lg transition cursor-pointer ml-2"
+                          title="Convert recommendation to AI Action Center task"
+                        >
+                          <Plus className="w-3 h-3" />
+                          <span>Add to Action Center</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </motion.div>

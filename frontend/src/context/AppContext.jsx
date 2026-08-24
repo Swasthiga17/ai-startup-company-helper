@@ -135,14 +135,16 @@ export function AppProvider({ children }) {
   const chat = useCallback(async (message, idea) => {
     setError(null);
     try {
-      const result = await sendChatMessage(message, idea);
+      const targetIdea = idea || currentStartup?.idea || (typeof analysis === 'string' ? analysis : analysis?.idea) || '';
+      const ideaStr = typeof targetIdea === 'object' ? (targetIdea?.idea || targetIdea?.problem_statement || JSON.stringify(targetIdea)) : targetIdea;
+      const result = await sendChatMessage(message, ideaStr);
       return result.reply || 'No response';
     } catch (err) {
       const msg = err?.response?.data?.detail || err?.message || 'Chat failed';
       setError(msg);
       throw err;
     }
-  }, []);
+  }, [currentStartup, analysis]);
 
   const generateDoc = useCallback(async (docType, idea) => {
     setLoading(true);
