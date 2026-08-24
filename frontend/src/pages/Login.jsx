@@ -111,7 +111,7 @@ export default function Login() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              src="/developer_illustration.png"
+              src="/developer_illustration.png?v=2"
               alt="AI Developer Co-founder"
               className="w-full max-w-[280px] object-contain rounded-2xl shadow-md border border-white/60 hover:scale-105 transition-transform duration-500"
             />
