@@ -19,4 +19,5 @@ frontend/dist/
 backend/output/
 backend/uploads/
 backend/startup_docs/
+backend/chroma_db/
 startup_guide.txt
