@@ -6,7 +6,7 @@ import {
   ArrowRight, ArrowLeft, CheckCircle, Clock, Play, UserPlus,
   Sparkles, Loader2, StickyNote, Inbox, ClipboardList, Users2
 } from 'lucide-react';
-import { sendChatMessage } from '../services/api';
+import { sendChatMessage, getActionItems, createActionItem, updateActionItem, deleteActionItem } from '../services/api';
 
 const container = {
   hidden: { opacity: 0 },
@@ -82,6 +82,28 @@ export default function WorkspaceHub() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('Co-Founder');
 
+  /* --- Fetch Remote Action Items --- */
+  useEffect(() => {
+    const fetchRemoteTasks = async () => {
+      try {
+        const res = await getActionItems();
+        if (res && res.items && res.items.length > 0) {
+          const mappedRemote = res.items.map(it => ({
+            id: it.id,
+            title: it.title,
+            desc: it.description || it.reason || '',
+            status: (it.status || 'TODO').toLowerCase().replace('_', '-'),
+            tag: it.category || 'General'
+          }));
+          setTasks(mappedRemote);
+        }
+      } catch (err) {
+        console.warn("Using local storage tasks fallback:", err);
+      }
+    };
+    fetchRemoteTasks();
+  }, []);
+
   /* --- Persist to localStorage on change --- */
   useEffect(() => { saveLS('wh_tasks', tasks); }, [tasks]);
   useEffect(() => { saveLS('wh_notes', notes); }, [notes]);
@@ -89,19 +111,48 @@ export default function WorkspaceHub() {
   useEffect(() => { saveLS('wh_members', members); }, [members]);
 
   /* --- Task Handlers --- */
-  const addTask = (e) => {
+  const addTask = async (e) => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
-    setTasks(prev => [...prev, { id: Date.now(), title: newTaskTitle, desc: newTaskDesc, status: 'todo', tag: newTaskTag }]);
+    const title = newTaskTitle.trim();
+    const desc = newTaskDesc.trim();
+    const tag = newTaskTag;
+
+    const tempId = Date.now();
+    setTasks(prev => [...prev, { id: tempId, title, desc, status: 'todo', tag }]);
     setNewTaskTitle(''); setNewTaskDesc(''); setNewTaskTag('General');
+
+    try {
+      const res = await createActionItem(title, 'HIGH', desc);
+      if (res && res.item) {
+        setTasks(prev => prev.map(t => t.id === tempId ? { ...t, id: res.item.id } : t));
+      }
+    } catch (err) {
+      console.warn("Failed to persist task to backend database:", err);
+    }
   };
 
-  const moveTask = (taskId, newStatus) => {
+  const moveTask = async (taskId, newStatus) => {
     setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
+    if (typeof taskId === 'number' && taskId < 1000000000000) {
+      try {
+        const dbStatus = newStatus.toUpperCase().replace('-', '_');
+        await updateActionItem(taskId, dbStatus);
+      } catch (err) {
+        console.warn("Failed to update task status on backend database:", err);
+      }
+    }
   };
 
-  const deleteTask = (taskId) => {
+  const deleteTask = async (taskId) => {
     setTasks(prev => prev.filter(t => t.id !== taskId));
+    if (typeof taskId === 'number' && taskId < 1000000000000) {
+      try {
+        await deleteActionItem(taskId);
+      } catch (err) {
+        console.warn("Failed to delete task on backend database:", err);
+      }
+    }
   };
 
   /* --- Note Handlers --- */
