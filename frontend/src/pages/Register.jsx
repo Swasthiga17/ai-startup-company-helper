@@ -26,7 +26,10 @@ export default function Register() {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (histResp.ok) {
-            const histData = await histResp.json();
+            let histData = {};
+            try {
+              histData = await histResp.json();
+            } catch {}
             if (histData.data && histData.data.length > 0) {
               navigate('/dashboard');
               return;
@@ -63,13 +66,29 @@ export default function Register() {
         body: JSON.stringify({ name: fullName, email, password, startupName, country, stage }),
       });
 
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data?.detail || 'Registration failed');
+      let data = {};
+      try {
+        data = await resp.json();
+      } catch {}
+
+      if (!resp.ok) {
+        throw new Error(data?.detail || data?.error || `Registration failed (Server error ${resp.status})`);
+      }
+
+      if (!data.access_token) {
+        throw new Error('Invalid response from server. Missing access token.');
+      }
 
       localStorage.setItem('token', data.access_token);
       navigate('/onboarding');
     } catch (err) {
-      setError(err?.message || 'Registration failed');
+      if (err.name === 'SyntaxError' || err.message?.includes('Unexpected token') || err.message?.includes('JSON')) {
+        setError('Unable to connect to server. Please ensure the backend server is running on port 8000.');
+      } else if (err.message === 'Failed to fetch') {
+        setError('Unable to connect to backend server. Check if backend server is running.');
+      } else {
+        setError(err?.message || 'Registration failed');
+      }
     }
   };
 
