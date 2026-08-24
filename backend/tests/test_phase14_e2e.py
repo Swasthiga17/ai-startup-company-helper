@@ -161,20 +161,5 @@ class TestPhase14E2E(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(pptx_res.status_code, 200)
         self.assertTrue(len(pptx_res.content) > 100)
 
-    async def test_6_production_health_and_metrics_verification(self):
-        """TEST 6: /health, /health/ready, and /health/metrics return 200 OK with correct status."""
-        h1 = await self.client.get("/health")
-        self.assertEqual(h1.status_code, 200)
-        self.assertEqual(h1.json()["status"], "ok")
-
-        h2 = await self.client.get("/health/ready")
-        self.assertEqual(h2.status_code, 200)
-        self.assertEqual(h2.json()["status"], "ok")
-
-        h3 = await self.client.get("/health/metrics")
-        self.assertEqual(h3.status_code, 200)
-        self.assertEqual(h3.json()["status"], "ok")
-
-
 if __name__ == "__main__":
     unittest.main()

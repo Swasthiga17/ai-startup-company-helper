@@ -3,7 +3,6 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import logging
-import time
 import uuid
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.exceptions import RequestValidationError
@@ -14,6 +13,7 @@ import socketio
 
 from database import init_db
 from core.exceptions import IdeaExecutorError
+from utils.logger import logger
 from routes.auth import router as auth_router
 from routes.analyze import router as analyze_router
 from routes.documents import router as documents_router
@@ -21,7 +21,6 @@ from routes.reports import router as reports_router
 from routes.simulator import router as simulator_router
 from routes.admin import router as admin_router
 from routes.voice import router as voice_router
-from routes.health import router as health_router
 from routes.workspace import router as workspace_router
 from routes.notifications import router as notifications_router
 from routes.action_items import router as action_items_router
@@ -62,45 +61,19 @@ app.add_middleware(
 )
 
 
-# Request ID, Observability & Security Headers Middleware
+# Request ID & Security Headers Middleware
 @app.middleware("http")
 async def add_request_id_and_security_headers(request: Request, call_next):
-    start_time = time.time()
     request_id = request.headers.get("X-Request-ID") or uuid.uuid4().hex[:12]
     request.state.request_id = request_id
 
-    try:
-        response = await call_next(request)
-        duration_ms = round((time.time() - start_time) * 1000.0, 2)
-        response.headers["X-Request-ID"] = request_id
-        response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-Frame-Options"] = "DENY"
-        response.headers["X-XSS-Protection"] = "1; mode=block"
-        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-
-        from core.observability import metrics_collector, log_structured_event
-        metrics_collector.inc_request(success=(response.status_code < 400))
-        log_structured_event("http_request", {
-            "request_id": request_id,
-            "method": request.method,
-            "endpoint": request.url.path,
-            "status_code": response.status_code,
-            "duration_ms": duration_ms
-        })
-        return response
-    except Exception as e:
-        duration_ms = round((time.time() - start_time) * 1000.0, 2)
-        from core.observability import metrics_collector, log_structured_event
-        metrics_collector.inc_request(success=False)
-        log_structured_event("http_request_error", {
-            "request_id": request_id,
-            "method": request.method,
-            "endpoint": request.url.path,
-            "status_code": 500,
-            "duration_ms": duration_ms,
-            "error": str(e)
-        }, level=logging.ERROR)
-        raise e
+    response = await call_next(request)
+    response.headers["X-Request-ID"] = request_id
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
 
 
 # Global Exception Handlers
@@ -167,12 +140,16 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
     )
 
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "service": "IdeaExecutor API", "version": "1.0.0"}
+
+
 # Ensure static/audio folder exists and mount static directory
 os.makedirs("static/audio", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Register sub-routers
-app.include_router(health_router)
 app.include_router(auth_router)
 app.include_router(analyze_router)
 app.include_router(documents_router)
@@ -183,6 +160,22 @@ app.include_router(voice_router)
 app.include_router(workspace_router)
 app.include_router(notifications_router)
 app.include_router(action_items_router)
+
+# Mount frontend/dist if built (for single-server Render deployment)
+frontend_dist_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "dist")
+if os.path.exists(frontend_dist_path):
+    assets_dir = os.path.join(frontend_dist_path, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="frontend_assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        file_path = os.path.join(frontend_dist_path, full_path)
+        if full_path and os.path.exists(file_path) and os.path.isfile(file_path):
+            from fastapi.responses import FileResponse
+            return FileResponse(file_path)
+        from fastapi.responses import FileResponse
+        return FileResponse(os.path.join(frontend_dist_path, "index.html"))
 
 
 from socket_server import sio

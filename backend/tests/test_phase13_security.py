@@ -75,7 +75,7 @@ class TestPhase13Security(unittest.IsolatedAsyncioTestCase):
 
     async def test_6_security_http_headers(self):
         """TEST 6: HTTP responses contain production security headers."""
-        res = await self.client.get("/health")
+        res = await self.client.get("/auth/me")
         self.assertEqual(res.headers.get("x-content-type-options"), "nosniff")
         self.assertEqual(res.headers.get("x-frame-options"), "DENY")
         self.assertEqual(res.headers.get("x-xss-protection"), "1; mode=block")
@@ -88,14 +88,14 @@ class TestPhase13Security(unittest.IsolatedAsyncioTestCase):
 
     async def test_8_zero_secret_leakage(self):
         """TEST 8: Protected routes do not leak raw JWT secret or Gemini API keys in responses."""
-        res = await self.client.get("/health/metrics")
+        res = await self.client.get("/action-items", headers=self.auth_headers)
         content_str = res.text
         self.assertNotIn(SECRET_KEY, content_str)
         self.assertNotIn("AIzaSy", content_str)
 
     async def test_9_x_request_id_correlation(self):
         """TEST 9: Security requests return X-Request-ID response header."""
-        res = await self.client.get("/health", headers={"X-Request-ID": "sec-test-777"})
+        res = await self.client.get("/auth/me", headers={"X-Request-ID": "sec-test-777"})
         self.assertEqual(res.headers.get("x-request-id"), "sec-test-777")
 
 

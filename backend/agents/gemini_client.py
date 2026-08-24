@@ -40,7 +40,7 @@ try:
         try:
             from google import genai
             client = genai.Client(api_key=GEMINI_API_KEY)
-            model_candidates = [configured_model, "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash-lite"]
+            model_candidates = [configured_model, "gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash"]
             model_candidates = list(dict.fromkeys(model_candidates))
             
             for candidate in model_candidates:

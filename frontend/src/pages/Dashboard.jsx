@@ -24,7 +24,7 @@ import {
 } from 'recharts';
 
 /* ─── Tabs ─── */
-const tabs = ['Overview', 'Market Research', 'Competitors', 'SWOT', 'Business Model', 'MVP Roadmap', 'Revenue Forecast', 'Pitch Deck'];
+const tabs = ['Overview', 'Market Research', 'Competitors', 'SWOT', 'MVP Roadmap', 'Revenue Forecast', 'Pitch Deck'];
 
 const agents = [
   { name: 'Market Agent', status: 'active', icon: Globe, color: 'from-violet-500 to-purple-500' },
@@ -705,7 +705,6 @@ export default function Dashboard() {
       case 'Market Research': return <MarketTab analysis={analysis} />;
       case 'Competitors': return <CompetitorTab analysis={analysis} />;
       case 'SWOT': return <SwotTab analysis={analysis} />;
-      case 'Business Model': return <BusinessModelTab analysis={analysis} />;
       case 'MVP Roadmap': return <RoadmapTab analysis={analysis} />;
       case 'Revenue Forecast': return <RevenueTab analysis={analysis} />;
       case 'Pitch Deck': return <PitchDeckTab analysis={analysis} downloadPptx={downloadPptx} downloadPdf={downloadPdf} />;

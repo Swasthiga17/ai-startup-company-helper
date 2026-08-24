@@ -18,7 +18,7 @@ from core.exceptions import (
 
 T = TypeVar("T", bound=BaseModel)
 
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 
 
 class LLMService:
@@ -28,7 +28,7 @@ class LLMService:
         self.client = None
         self.available = False
         self.sdk_type = None  # "modern" or "legacy"
-        self.fallback_models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash-lite"]
+        self.fallback_models = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash-exp", "gemini-1.5-flash-8b"]
         self._initialize()
 
     def _initialize(self):
@@ -95,17 +95,6 @@ class LLMService:
 
                     if text_result:
                         self.model_name = model_candidate
-                        duration_ms = round((time.time() - start_time) * 1000.0, 2)
-                        
-                        from core.observability import metrics_collector, log_structured_event
-                        metrics_collector.inc_llm(success=True, retries=total_retries)
-                        log_structured_event("llm_request", {
-                            "model": model_candidate,
-                            "duration_ms": duration_ms,
-                            "retries": total_retries,
-                            "success": True,
-                            "sdk_type": self.sdk_type
-                        })
                         return text_result
                     else:
                         logger.warning(f"Empty LLM response received from {model_candidate} on attempt {attempt + 1}")

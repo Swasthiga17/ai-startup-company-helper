@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: ideaexecutor
+    env: python
+    buildCommand: pip install -r backend/requirements.txt && cd frontend && npm ci && npm run build
+    startCommand: uvicorn backend.app:socket_app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: ""
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ideaexecutor-db
+          property: connectionString
+
+databases:
+  - name: ideaexecutor-db
+    databaseName: startupdb
+    user: startupuser
+

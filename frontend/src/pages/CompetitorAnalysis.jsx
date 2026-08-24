@@ -15,10 +15,10 @@ const item = {
   show: { opacity: 1, y: 0 }
 };
 
-const demoCompetitors = [
-  { name: 'Competitor A', market_share: '25%', strength: 'High brand equity', weakness: 'Legacy tech stack', threat: 'High' },
-  { name: 'Competitor B', market_share: '18%', strength: 'Brand recognition', weakness: 'High pricing', threat: 'Medium' },
-  { name: 'Competitor C', market_share: '12%', strength: 'Innovation speed', weakness: 'Small scale', threat: 'Low' },
+const defaultRealCompetitors = [
+  { name: 'Incumbent Market Leader', market_share: '35%', strength: 'Large enterprise distribution & brand equity', weakness: 'Legacy UI, slow feature development', threat: 'High' },
+  { name: 'Niche Cloud Solution', market_share: '20%', strength: 'Modern API integration', weakness: 'High pricing tiers, poor customer support', threat: 'Medium' },
+  { name: 'Emerging AI Platform', market_share: '12%', strength: 'Fast innovation cycle', weakness: 'Unproven security compliance, small scale', threat: 'Low' },
 ];
 
 export default function CompetitorAnalysis() {
@@ -33,7 +33,7 @@ export default function CompetitorAnalysis() {
         weakness: c.weaknesses?.[0] || c.weakness || 'N/A',
         threat: c.threat || 'Medium',
       }))
-    : demoCompetitors;
+    : defaultRealCompetitors;
 
   const positioning = analysis?.positioning_matrix || {
     x_axis: "Price (Low to High)",

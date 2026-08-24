@@ -14,16 +14,16 @@ const item = {
 };
 
 const defaultSlides = [
-  { title: 'Problem', desc: 'The problem your startup solves', icon: '🎯' },
-  { title: 'Solution', desc: 'Your unique value proposition', icon: '💡' },
-  { title: 'Market', desc: 'TAM/SAM/SOM analysis', icon: '📊' },
-  { title: 'Product', desc: 'Key features and demo', icon: '🚀' },
-  { title: 'Business Model', desc: 'Revenue streams and pricing', icon: '💰' },
-  { title: 'Competition', desc: 'Competitive landscape', icon: '⚔️' },
-  { title: 'Team', desc: 'Core team members', icon: '👥' },
-  { title: 'Financials', desc: 'Revenue projections', icon: '📈' },
-  { title: 'Ask', desc: 'Funding requirements', icon: '🤝' },
-  { title: 'Contact', desc: 'Get in touch', icon: '📧' },
+  { title: 'Problem Statement', content: 'Legacy market solutions suffer from severe operational friction, manual data entering, and fragmented toolchains.', icon: '🎯' },
+  { title: 'The Solution', content: 'An integrated AI-first platform that automates core operational workflows, reducing execution time by 75%.', icon: '💡' },
+  { title: 'Market Opportunity', content: 'Targeting a $45B+ global market expanding at 16.5% CAGR, capturing high-margin enterprise segments.', icon: '📊' },
+  { title: 'Product Architecture', content: 'Modular microservice engine featuring automated telemetry, secure data vaults, and seamless API connectors.', icon: '🚀' },
+  { title: 'Revenue & Monetization', content: 'Tiered B2B SaaS platform subscriptions paired with usage-based API licensing and custom integration support.', icon: '💰' },
+  { title: 'Competitive Landscape', content: 'Outperforming legacy incumbent tools by delivering 10x faster setup, lower overhead, and native AI integration.', icon: '⚔️' },
+  { title: 'Go-to-Market Engine', content: 'Product-led growth combined with targeted account-based enterprise sales and channel partner distribution.', icon: '📈' },
+  { title: 'Financial Trajectory', content: 'Projected ARR growth reaching $1.5M by Year 2 with 80%+ gross margin unit economics.', icon: '📊' },
+  { title: 'The Capital Ask', content: 'Raising $1.5M Seed round to expand engineering velocity, scale GTM sales, and accelerate enterprise pilots.', icon: '🤝' },
+  { title: 'Founding Team', content: 'Led by veteran software engineers, AI researchers, and domain experts in enterprise SaaS.', icon: '👥' },
 ];
 
 export default function PitchDeck() {

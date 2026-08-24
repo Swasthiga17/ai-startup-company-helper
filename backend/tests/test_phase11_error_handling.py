@@ -41,37 +41,21 @@ class TestPhase11ErrorHandling(unittest.IsolatedAsyncioTestCase):
     async def asyncTearDown(self):
         await self.client.aclose()
 
-    async def test_1_standard_health_endpoint(self):
-        """TEST 1: GET /health returns basic operational status without requiring Gemini."""
-        res = await self.client.get("/health")
-        self.assertEqual(res.status_code, 200)
-        data = res.json()
-        self.assertEqual(data["status"], "ok")
-        self.assertEqual(data["service"], "ideaexecutor-api")
-
-    async def test_2_readiness_endpoint(self):
-        """TEST 2: GET /health/ready returns database & vector store readiness status."""
-        res = await self.client.get("/health/ready")
-        self.assertEqual(res.status_code, 200)
-        data = res.json()
-        self.assertIn("database", data)
-        self.assertIn("vector_store", data)
-
-    async def test_3_request_id_middleware(self):
-        """TEST 3: X-Request-ID header is generated and returned in HTTP responses."""
-        res = await self.client.get("/health")
+    async def test_1_request_id_middleware(self):
+        """TEST 1: X-Request-ID header is generated and returned in HTTP responses."""
+        res = await self.client.get("/auth/me")
         self.assertIn("x-request-id", res.headers)
         req_id = res.headers["x-request-id"]
         self.assertTrue(len(req_id) > 0)
 
-    async def test_4_request_id_propagation(self):
-        """TEST 4: Client-provided X-Request-ID is preserved and echoed back."""
+    async def test_2_request_id_propagation(self):
+        """TEST 2: Client-provided X-Request-ID is preserved and echoed back."""
         custom_id = "custom-id-999"
-        res = await self.client.get("/health", headers={"X-Request-ID": custom_id})
+        res = await self.client.get("/auth/me", headers={"X-Request-ID": custom_id})
         self.assertEqual(res.headers.get("x-request-id"), custom_id)
 
-    async def test_5_custom_exceptions_schema(self):
-        """TEST 5: Custom exception objects expose message, error_code, and retryable flag."""
+    async def test_3_custom_exceptions_schema(self):
+        """TEST 3: Custom exception objects expose message, error_code, and retryable flag."""
         err = LLMRateLimitError()
         self.assertEqual(err.error_code, "LLM_RATE_LIMITED")
         self.assertTrue(err.retryable)
@@ -80,15 +64,15 @@ class TestPhase11ErrorHandling(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(auth_err.error_code, "LLM_AUTHENTICATION_FAILED")
         self.assertFalse(auth_err.retryable)
 
-    async def test_6_no_secret_leakage_in_error_messages(self):
-        """TEST 6: Custom error messages do not expose sensitive API keys or filesystem paths."""
+    async def test_4_no_secret_leakage_in_error_messages(self):
+        """TEST 4: Custom error messages do not expose sensitive API keys or filesystem paths."""
         err = LLMAuthenticationError()
         err_msg = str(err.message)
         self.assertNotIn("AIzaSy", err_msg)
         self.assertNotIn("C:\\Users", err_msg)
 
-    async def test_7_validation_error_format(self):
-        """TEST 7: Request validation error returns standardized error contract with HTTP 422."""
+    async def test_5_validation_error_format(self):
+        """TEST 5: Request validation error returns standardized error contract with HTTP 422."""
         res = await self.client.post("/devils-advocate", json={}, headers=self.headers)
         self.assertEqual(res.status_code, 422)
         data = res.json()
@@ -96,13 +80,13 @@ class TestPhase11ErrorHandling(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(data["error_code"], "VALIDATION_ERROR")
         self.assertIn("request_id", data)
 
-    async def test_8_unauthorized_error_format(self):
-        """TEST 8: Protected routes return standard error contract without raw stack traces."""
+    async def test_6_unauthorized_error_format(self):
+        """TEST 6: Protected routes return standard error contract without raw stack traces."""
         res = await self.client.post("/analyze", json={"idea": "Test"})
         self.assertEqual(res.status_code, 401)
 
-    async def test_9_llm_json_repair_failure_handling(self):
-        """TEST 9: LLM json cleaning utility safely handles garbage text."""
+    async def test_7_llm_json_repair_failure_handling(self):
+        """TEST 7: LLM json cleaning utility safely handles garbage text."""
         clean = llm_service._clean_json_text("```json\n{\"test\": 123}\n```")
         self.assertEqual(clean, "{\"test\": 123}")
 

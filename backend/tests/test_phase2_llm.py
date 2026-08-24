@@ -5,16 +5,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import unittest
 from services.llm_service import llm_service
 from models.schemas import IdeaAnalysisSchema
-from routes.health import ai_health_check
 
 
 class TestPhase2LLM(unittest.TestCase):
-
-    def test_ai_health_endpoint(self):
-        """Verify GET /health/ai diagnostic response."""
-        res = ai_health_check()
-        self.assertIn("success", res)
-        self.assertIn("status", res)
 
     def test_real_gemini_text_generation(self):
         """Test ONE real Gemini text request."""

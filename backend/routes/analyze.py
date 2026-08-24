@@ -45,14 +45,16 @@ async def analyze(data: StartupIdea, current_user=Depends(get_current_user)):
             "execution_status": "STARTING"
         })
         db: Session = SessionLocal()
+        analysis_id = None
         try:
             analysis = Analysis(user_id=current_user.id, idea=data.idea, payload=json.dumps(result))
             db.add(analysis)
             db.commit()
             db.refresh(analysis)
+            analysis_id = analysis.id
 
             from services.action_item_service import extract_and_persist_action_items
-            persisted_actions = extract_and_persist_action_items(db, user_id=current_user.id, analysis_id=analysis.id, state=result)
+            persisted_actions = extract_and_persist_action_items(db, user_id=current_user.id, analysis_id=analysis_id, state=result)
             result["persisted_action_items"] = persisted_actions
         finally:
             db.close()
@@ -77,7 +79,7 @@ async def analyze(data: StartupIdea, current_user=Depends(get_current_user)):
 
         result["status"] = overall_status
         result["failed_agents"] = failed_agents
-        return {"status": "success", "execution_status": overall_status, "data": result, "analysisId": analysis.id}
+        return {"status": "success", "execution_status": overall_status, "data": result, "analysisId": analysis_id}
 
     except Exception as e:
         error_detail = traceback.format_exc()
