@@ -19,5 +19,6 @@ bcrypt
 httpx
 pydantic
 pydantic-settings
+email-validator
 python-socketio
 
