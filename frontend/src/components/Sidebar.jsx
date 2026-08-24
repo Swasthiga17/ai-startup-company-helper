@@ -106,13 +106,7 @@ const groups = [
     title: 'AI CO-FOUNDER',
     links: [
       { path: '/chat', icon: MessageSquare, label: 'AI Mentor Chat' },
-      { path: '/simulators', icon: Play, label: 'Roleplay & Simulator' },
-      { path: '/voice-studio', icon: Mic, label: 'Voice Studio' },
-    ]
-  },
-  {
-    title: 'KNOWLEDGE BASE',
-    links: [
+      { path: '/workspace-hub', icon: CheckCircle2, label: 'AI Action Center' },
       { path: '/documents', icon: FileText, label: 'Documents & RAG' },
     ]
   }

@@ -8,7 +8,6 @@ import {
   Check, Cpu, Star, Flame, ChevronRight, Activity, Zap, CheckCircle2, MessageSquare, Bot,
   Layers, PieChart, TrendingUp, HelpCircle, Filter, RefreshCw
 } from 'lucide-react';
-import VoicePlayerBar from '../components/VoicePlayerBar';
 
 // Complete problem-solution templates for category cards
 const categoryDataset = {
@@ -1925,11 +1924,6 @@ export default function InputPage() {
         )}
       </main>
 
-      {/* Voice Narration */}
-      <VoicePlayerBar
-        title="Startup Pilot Guidance"
-        textToRead="Welcome to Startup Pilot! Select your target domain, skills, and business model to generate 5 to 10 tailored AI startup ideas."
-      />
     </div>
   );
 }

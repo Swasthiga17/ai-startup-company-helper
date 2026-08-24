@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../hooks/useApp';
 import { Link } from 'react-router-dom';
-import VoicePlayerBar from '../components/VoicePlayerBar';
 import ConfidenceScoreBadge from '../components/ConfidenceScoreBadge';
 import ActionItemsChecklist from '../components/ActionItemsChecklist';
 import MentorSuggestionsCard from '../components/MentorSuggestionsCard';
@@ -850,12 +849,6 @@ export default function Dashboard() {
         } />
       </div>
 
-      {/* Voice Narration Player Bar */}
-
-      <VoicePlayerBar
-        title={`${activeTab} Narration`}
-        textToRead={`Here is the ${activeTab} report summary for your startup ${analysis.idea ? 'idea ' + analysis.idea : ''}.`}
-      />
     </div>
   );
 }

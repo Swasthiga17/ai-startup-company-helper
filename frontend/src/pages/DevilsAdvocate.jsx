@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldAlert, Flame, Lightbulb, RefreshCw, ArrowRight, TrendingUp, Sparkles, HelpCircle } from 'lucide-react';
+import { ShieldAlert, Flame, Lightbulb, RefreshCw, ArrowRight, TrendingUp, Sparkles, HelpCircle, Edit3 } from 'lucide-react';
 import { getDevilsAdvocate } from '../services/api';
 
 const container = {
@@ -16,23 +16,34 @@ const item = {
 
 export default function DevilsAdvocate() {
   const { currentStartup, loadStartups } = useApp();
+  const [ideaInput, setIdeaInput] = useState(currentStartup?.idea || '');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
-  // P5 fix: ensure startups are loaded on direct navigation
   useEffect(() => {
     if (!currentStartup && loadStartups) {
       loadStartups();
     }
   }, []);
 
-  const loadCritique = async (force = false) => {
-    if (!currentStartup?.idea) return;
+  useEffect(() => {
+    if (currentStartup?.idea) {
+      setIdeaInput(currentStartup.idea);
+      loadCritique(currentStartup.idea);
+    }
+  }, [currentStartup]);
+
+  const loadCritique = async (ideaToUse) => {
+    const targetIdea = (typeof ideaToUse === 'string' ? ideaToUse : ideaInput).trim();
+    if (!targetIdea) {
+      setError('Please enter or select a startup idea to stress-test.');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const res = await getDevilsAdvocate(currentStartup.idea);
+      const res = await getDevilsAdvocate(targetIdea);
       if (res.status === 'success' && res.data) {
         setData(res.data);
       } else {
@@ -40,54 +51,60 @@ export default function DevilsAdvocate() {
       }
     } catch (err) {
       console.error(err);
-      setError('Failed to load stress test. Using offline evaluation rules.');
+      setError('Failed to load stress test analysis. Please ensure backend is running.');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (currentStartup?.idea) {
-      loadCritique();
-    }
-  }, [currentStartup]);
-
-  if (!currentStartup) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center text-left">
-        <div className="rounded-3xl p-8 text-center bg-white border border-slate-100 shadow-xl max-w-sm w-full">
-          <ShieldAlert className="w-11 h-11 text-rose-500 mx-auto mb-4 animate-bounce" />
-          <h3 className="text-sm font-extrabold text-slate-800 mb-2">Devil's Advocate Station</h3>
-          <p className="text-xs text-slate-400 font-semibold leading-relaxed">
-            Please create or select an active startup workspace to begin stress-testing your business idea.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6 text-left max-w-5xl mx-auto">
       
-      {/* Title Card */}
-      <motion.div variants={item} className="rounded-2xl p-6 relative overflow-hidden bg-white border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2.5 mb-2">
-            <Flame className="w-6 h-6 text-rose-500" />
-            <h2 className="text-xl font-bold text-slate-800">Devil's Advocate & Pivots</h2>
+      {/* Header Banner & Idea Input Field */}
+      <motion.div variants={item} className="rounded-2xl p-6 relative overflow-hidden bg-white border border-slate-100 shadow-sm space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2.5 mb-2">
+              <Flame className="w-6 h-6 text-rose-500" />
+              <h2 className="text-xl font-bold text-slate-800">Devil's Advocate & Strategic Pivots</h2>
+            </div>
+            <p className="text-xs text-slate-500 font-semibold max-w-2xl">
+              Stress-test your startup idea through adversarial AI critique. Uncover hidden assumptions, market vulnerabilities, and defensible pivot recommendations.
+            </p>
           </div>
-          <p className="text-xs text-slate-450 font-semibold max-w-2xl">
-            Stress-test your idea through adversarial critique, identify critical vulnerabilities, and explore strategic market pivot directions.
-          </p>
+          <button
+            onClick={() => loadCritique(ideaInput)}
+            disabled={loading || !ideaInput.trim()}
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 text-white text-xs font-black shadow-md flex items-center gap-1.5 hover:brightness-105 active:scale-95 transition disabled:opacity-50 cursor-pointer self-start md:self-auto shrink-0"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <span>{loading ? 'Re-analyzing...' : 'Trigger Critique'}</span>
+          </button>
         </div>
-        <button
-          onClick={() => loadCritique(true)}
-          disabled={loading}
-          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 text-white text-xs font-black shadow-md flex items-center gap-1.5 hover:brightness-105 active:scale-95 transition disabled:opacity-50 cursor-pointer self-start md:self-auto"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          <span>{loading ? 'Re-analyzing...' : 'Trigger Critique'}</span>
-        </button>
+
+        {/* Interactive Idea Input Field */}
+        <div className="pt-2 border-t border-slate-100">
+          <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider block mb-1.5 flex items-center gap-1.5">
+            <Edit3 className="w-3.5 h-3.5 text-rose-500" />
+            <span>Target Startup Idea for Stress-Test</span>
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={ideaInput}
+              onChange={(e) => setIdeaInput(e.target.value)}
+              placeholder="e.g. AI-powered learning platform for college students"
+              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-400/40 focus:border-rose-500 transition"
+            />
+            <button
+              onClick={() => loadCritique(ideaInput)}
+              disabled={loading || !ideaInput.trim()}
+              className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer disabled:opacity-50"
+            >
+              Analyze Idea
+            </button>
+          </div>
+        </div>
       </motion.div>
 
       {error && (
@@ -99,10 +116,10 @@ export default function DevilsAdvocate() {
       {loading && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-4">
-            <div className="h-64 skeleton"></div>
-            <div className="h-40 skeleton"></div>
+            <div className="h-64 skeleton rounded-2xl"></div>
+            <div className="h-40 skeleton rounded-2xl"></div>
           </div>
-          <div className="md:col-span-1 h-96 skeleton"></div>
+          <div className="md:col-span-1 h-96 skeleton rounded-2xl"></div>
         </div>
       )}
 
@@ -138,7 +155,7 @@ export default function DevilsAdvocate() {
                       <div className="w-5 h-5 rounded-full bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
                         ☠
                       </div>
-                      <p className="text-xs text-slate-650 font-semibold leading-relaxed">{pt}</p>
+                      <p className="text-xs text-slate-700 font-semibold leading-relaxed">{pt}</p>
                     </motion.div>
                   ))}
                 </div>

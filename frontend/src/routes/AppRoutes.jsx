@@ -35,11 +35,9 @@ import Pricing from '../pages/Pricing';
 import Notifications from '../pages/Notifications';
 import AdminPanel from '../pages/AdminPanel';
 import LaunchReadiness from '../pages/LaunchReadiness';
-import VoiceStudio from '../pages/VoiceStudio';
 import InvestorReadiness from '../pages/InvestorReadiness';
 import InvestorMode from '../pages/InvestorMode';
 import DevilsAdvocate from '../pages/DevilsAdvocate';
-import Simulators from '../pages/Simulators';
 import DocumentGenerator from '../pages/DocumentGenerator';
 import BrandCreation from '../pages/BrandCreation';
 import SalesStrategy from '../pages/SalesStrategy';
@@ -69,9 +67,7 @@ const titles = {
   '/documents': 'Document Upload',
   '/workspace-hub': 'Workspace Hub',
   '/devils-advocate': "Devil's Advocate & Pivots",
-  '/simulators': 'Roleplay Simulators',
   '/launch-readiness': 'Launch Readiness Dashboard',
-  '/voice-studio': 'AI Voice Studio & Voice Cloning',
   '/investor-readiness': 'Investor Readiness Score',
   '/investor-mode': 'Investor Mode & Funding Suite',
   '/brand-creation': 'Brand Creation & Identity',
