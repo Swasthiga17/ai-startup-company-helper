@@ -215,7 +215,13 @@ export default function Login() {
           {/* Google Button */}
           <button
             type="button"
-            onClick={() => alert('Google authentication login configured.')}
+            onClick={() => {
+              if (window.google?.accounts?.id) {
+                alert('Google Sign-In service initialized.');
+              } else {
+                alert('Google OAuth login demo mode: Sign up or log in using email/password above.');
+              }
+            }}
             className="w-full py-3 bg-white hover:bg-slate-50 border border-slate-200/80 text-slate-700 text-xs font-bold rounded-full flex items-center justify-center gap-3 shadow-sm hover:shadow transition cursor-pointer relative z-10"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">

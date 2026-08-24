@@ -127,13 +127,10 @@ export default function AppRoutes() {
       <Route path="/hiring-plan" element={<ProtectedRoute><Layout title={titles['/hiring-plan']}><HiringPlan /></Layout></ProtectedRoute>} />
       <Route path="/tech-stack" element={<ProtectedRoute><Layout title={titles['/tech-stack']}><TechStack /></Layout></ProtectedRoute>} />
       <Route path="/growth-advisor" element={<ProtectedRoute><Layout title={titles['/growth-advisor']}><GrowthAdvisor /></Layout></ProtectedRoute>} />
-      <Route path="/devils-advocate" element={<ProtectedRoute><Layout title={titles['/devils-advocate']}><DevilsAdvocate /></Layout></ProtectedRoute>} />
-      <Route path="/simulators" element={<ProtectedRoute><Layout title={titles['/simulators']}><Simulators /></Layout></ProtectedRoute>} />
       <Route path="/document-generator" element={<ProtectedRoute><Layout title={titles['/document-generator']}><DocumentGenerator /></Layout></ProtectedRoute>} />
       <Route path="/investor-mode" element={<ProtectedRoute><Layout title={titles['/investor-mode']}><InvestorMode /></Layout></ProtectedRoute>} />
 
       {/* Premium Route bindings */}
-      <Route path="/voice-studio" element={<ProtectedRoute><Layout title={titles['/voice-studio']}><VoiceStudio /></Layout></ProtectedRoute>} />
       <Route path="/workspace" element={<ProtectedRoute><Layout title="Workspace"><Workspace /></Layout></ProtectedRoute>} />
       <Route path="/workspace-hub" element={<ProtectedRoute><Layout title={titles['/workspace-hub']}><WorkspaceHub /></Layout></ProtectedRoute>} />
       <Route path="/investor-readiness" element={<ProtectedRoute><Layout title={titles['/investor-readiness']}><InvestorReadiness /></Layout></ProtectedRoute>} />
