@@ -196,6 +196,7 @@ from routes.optimization import router as optimization_router
 from routes.pmf import router as pmf_router
 from routes.billing import router as billing_router
 from routes.founder_os import router as founder_os_router
+from routes.synthetic_validation import router as synthetic_router
 
 app.include_router(decisions_router)
 app.include_router(experiments_router)
@@ -206,6 +207,7 @@ app.include_router(optimization_router)
 app.include_router(pmf_router)
 app.include_router(billing_router)
 app.include_router(founder_os_router)
+app.include_router(synthetic_router)
 
 # Mount frontend/dist if built (for single-server Render deployment)
 frontend_dist_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "dist")
