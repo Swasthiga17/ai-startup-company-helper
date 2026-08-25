@@ -13,6 +13,7 @@ from agents.domain_agents import (
     run_growth_agent,
     run_mentor_agent
 )
+from agents.verifier_agent import run_verifier_agent
 from utils.logger import logger
 
 
@@ -336,6 +337,17 @@ def synthesis_node(state: StartupState) -> Dict[str, Any]:
     }
 
 
+def verifier_node(state: StartupState) -> Dict[str, Any]:
+    logger.info("[LangGraph] [Agent:Verifier] Executing Fact-Checking and Evidence Audit")
+    v_res = run_verifier_agent(state)
+    return {
+        "verifier_analysis": v_res,
+        "verification_status": v_res.get("verification_status", "SUPPORTED"),
+        "evidence_items": v_res.get("evidence_items", []),
+        "financial_projections": v_res.get("financial_projections", {})
+    }
+
+
 def mentor_node(state: StartupState) -> Dict[str, Any]:
     t0 = time.time()
     logger.info("[LangGraph] [Agent:Mentor] Started")
@@ -398,6 +410,7 @@ builder.add_node("product_node", product_node)
 builder.add_node("operations_node", operations_node)
 builder.add_node("growth_node", growth_node)
 builder.add_node("synthesis_node", synthesis_node)
+builder.add_node("verifier_node", verifier_node)
 builder.add_node("mentor_node", mentor_node)
 
 builder.add_edge(START, "idea_node")
@@ -407,7 +420,8 @@ builder.add_edge("idea_node", "product_node")
 builder.add_edge(["market_node", "business_node", "product_node"], "operations_node")
 builder.add_edge("operations_node", "growth_node")
 builder.add_edge("growth_node", "synthesis_node")
-builder.add_edge("synthesis_node", "mentor_node")
+builder.add_edge("synthesis_node", "verifier_node")
+builder.add_edge("verifier_node", "mentor_node")
 builder.add_edge("mentor_node", END)
 
 startup_graph = builder.compile()

@@ -24,6 +24,9 @@ from routes.voice import router as voice_router
 from routes.workspace import router as workspace_router
 from routes.notifications import router as notifications_router
 from routes.action_items import router as action_items_router
+from routes.decisions import router as decisions_router
+from routes.experiments import router as experiments_router
+from routes.intelligence import router as intelligence_router
 
 logging.basicConfig(level=logging.INFO)
 from contextlib import asynccontextmanager
@@ -150,6 +153,28 @@ async def health_check():
     return {"status": "ok", "service": "IdeaExecutor API", "version": "1.0.0"}
 
 
+@app.get("/readiness")
+async def readiness_check():
+    try:
+        from database import engine
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        db_status = "connected"
+    except Exception as e:
+        db_status = f"error: {e}"
+
+    from services.llm_service import llm_service
+    llm_status = "ready" if llm_service.available else "unconfigured_or_limited"
+
+    return {
+        "status": "ready" if db_status == "connected" else "degraded",
+        "database": db_status,
+        "llm_service": llm_status,
+        "timestamp": os.environ.get("CURRENT_TIME", "")
+    }
+
+
 # Ensure static/audio folder exists and mount static directory
 os.makedirs("static/audio", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -165,6 +190,16 @@ app.include_router(voice_router)
 app.include_router(workspace_router)
 app.include_router(notifications_router)
 app.include_router(action_items_router)
+from routes.timeline import router as timeline_router
+from routes.feedback import router as feedback_router
+from routes.optimization import router as optimization_router
+
+app.include_router(decisions_router)
+app.include_router(experiments_router)
+app.include_router(intelligence_router)
+app.include_router(timeline_router)
+app.include_router(feedback_router)
+app.include_router(optimization_router)
 
 # Mount frontend/dist if built (for single-server Render deployment)
 frontend_dist_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "dist")

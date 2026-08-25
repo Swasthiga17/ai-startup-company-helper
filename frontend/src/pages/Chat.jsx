@@ -404,6 +404,15 @@ export default function Chat() {
                       }`}
                     >
                       <p className="whitespace-pre-line">{msg.content}</p>
+                      {msg.actionCta && (
+                        <button
+                          onClick={() => handleQuickAction(msg.actionCta)}
+                          className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs shadow-md hover:opacity-95 transition cursor-pointer"
+                        >
+                          <span>[{msg.actionCta}]</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
 
                     <div className={`flex items-center gap-2 text-[10px] text-slate-400 font-semibold px-1 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>

@@ -21,7 +21,7 @@ async def download_pdf(analysisId: int, current_user=Depends(get_current_user)):
         try:
             analysis = db.query(Analysis).filter(Analysis.id == analysisId, Analysis.user_id == current_user.id).first()
             if not analysis:
-                raise HTTPException(status_code=404, detail="Analysis not found")
+                raise HTTPException(status_code=403, detail="Analysis not found or access forbidden.")
             result = json.loads(analysis.payload)
         finally:
             db.close()
@@ -33,6 +33,8 @@ async def download_pdf(analysisId: int, current_user=Depends(get_current_user)):
 
         generate_pdf(result, path)
         return FileResponse(path, media_type="application/pdf", filename="startup_report.pdf")
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"PDF generation failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -45,7 +47,7 @@ async def download_pptx(analysisId: int, current_user=Depends(get_current_user))
         try:
             analysis = db.query(Analysis).filter(Analysis.id == analysisId, Analysis.user_id == current_user.id).first()
             if not analysis:
-                raise HTTPException(status_code=404, detail="Analysis not found")
+                raise HTTPException(status_code=403, detail="Analysis not found or access forbidden.")
             result = json.loads(analysis.payload)
         finally:
             db.close()
@@ -61,6 +63,8 @@ async def download_pptx(analysisId: int, current_user=Depends(get_current_user))
             media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
             filename="pitch_deck.pptx"
         )
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"PPTX generation failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))

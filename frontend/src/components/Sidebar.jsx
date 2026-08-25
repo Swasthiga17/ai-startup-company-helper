@@ -1,189 +1,165 @@
-
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  BarChart3,
-  TrendingUp,
-  Users,
-  Target,
-  Briefcase,
-  Map,
-  LineChart,
-  Presentation,
   Home,
-  MessageSquare,
-  FileText,
-  Zap,
-  ChevronRight,
-  Sparkles,
-  Mic,
-  LogOut,
-  Trello,
-  Flame,
-  CheckCircle,
-  CheckCircle2,
-  DollarSign,
-  Compass,
-  Tag,
-  ShieldAlert,
-  Users2,
-  Play,
-  Award,
+  Bot,
+  Lightbulb,
   Globe,
-  Shield,
+  Briefcase,
+  Wrench,
+  Target,
+  BookOpen,
+  FileText,
+  Presentation,
+  ChevronDown,
+  ChevronRight,
+  Plus,
+  LogOut,
+  Settings,
+  HelpCircle,
+  User,
+  MessageSquare,
+  Sun,
+  Sparkles,
+  Users,
+  BarChart3,
+  ShieldAlert,
+  DollarSign,
+  Zap,
+  Tag,
+  LineChart,
+  Rocket,
+  CheckSquare,
+  FlaskConical,
+  Activity,
+  Compass,
   Cpu,
-  Plus
+  Flame,
+  Award,
+  CheckCircle2
 } from 'lucide-react';
 
-const groups = [
+const workflowSections = [
   {
-    title: 'EXECUTIVE',
-    links: [
-      { path: '/dashboard', icon: Home, label: 'Dashboard Overview' },
+    id: 'overview',
+    title: 'Overview',
+    icon: Home,
+    path: '/dashboard',
+    isSingle: true
+  },
+  {
+    id: 'ai-cofounder',
+    title: 'AI Co-Founder',
+    icon: Bot,
+    defaultOpen: true,
+    items: [
+      { label: 'Chat', path: '/chat', icon: MessageSquare },
+      { label: 'Morning Brief', path: '/dashboard', icon: Sun },
+      { label: 'Recommendations', path: '/ai-recommendations', icon: Sparkles },
+      { label: 'AI Founding Team', path: '/dashboard', icon: Users }
     ]
   },
   {
-    title: 'DISCOVERY',
-    links: [
-      { path: '/problem-validation', icon: CheckCircle, label: 'Idea Validation' },
-      { path: '/value-prop', icon: Sparkles, label: 'Problem Fit & Value Prop' },
-      { path: '/target-customers', icon: Users, label: 'Customer Personas' },
+    id: 'startup',
+    title: 'Startup',
+    icon: Lightbulb,
+    defaultOpen: true,
+    items: [
+      { label: 'My Startup', path: '/input', icon: Rocket },
+      { label: 'Idea Validation', path: '/problem-validation', icon: CheckCircle2 },
+      { label: 'Value Prop', path: '/value-prop', icon: Sparkles },
+      { label: 'Customer Personas', path: '/target-customers', icon: Users },
+      { label: 'Startup Health', path: '/launch-readiness', icon: Activity }
     ]
   },
   {
-    title: 'MARKET & RISK',
-    links: [
-      { path: '/market', icon: Globe, label: 'Market Research' },
-      { path: '/competitors', icon: BarChart3, label: 'Competitor Analysis' },
-      { path: '/swot', icon: Target, label: 'SWOT & Risk Analysis' },
+    id: 'intelligence',
+    title: 'Intelligence',
+    icon: Globe,
+    items: [
+      { label: 'Market Research', path: '/market', icon: Globe },
+      { label: 'Competitor Analysis', path: '/competitors', icon: BarChart3 },
+      { label: 'SWOT Analysis', path: '/swot', icon: Target },
+      { label: 'Market Watch', path: '/workspace-hub', icon: Compass }
     ]
   },
   {
-    title: 'PRODUCT',
-    links: [
-      { path: '/feature-planning', icon: Trello, label: 'Feature Planning' },
-      { path: '/tech-stack', icon: Cpu, label: 'Technology Stack' },
-      { path: '/roadmap', icon: Map, label: 'MVP Roadmap' },
+    id: 'strategy',
+    title: 'Strategy',
+    icon: Briefcase,
+    items: [
+      { label: 'Business Model', path: '/business-model', icon: Briefcase },
+      { label: 'Revenue Strategy', path: '/revenue-model', icon: DollarSign },
+      { label: 'Pricing Plans', path: '/pricing', icon: Tag },
+      { label: 'Financial Forecast', path: '/revenue', icon: LineChart },
+      { label: 'Growth Strategy', path: '/growth-advisor', icon: Zap },
+      { label: 'What-If Simulator', path: '/devils-advocate', icon: ShieldAlert }
     ]
   },
   {
-    title: 'BUSINESS & FINANCE',
-    links: [
-      { path: '/business-model', icon: Briefcase, label: 'Business Model' },
-      { path: '/revenue-model', icon: DollarSign, label: 'Revenue Strategy' },
-      { path: '/pricing', icon: Tag, label: 'Pricing Plans' },
-      { path: '/revenue', icon: LineChart, label: 'Financial Projections' },
+    id: 'build',
+    title: 'Build',
+    icon: Wrench,
+    items: [
+      { label: 'MVP Roadmap', path: '/roadmap', icon: Rocket },
+      { label: 'Action Items', path: '/workspace-hub', icon: CheckSquare },
+      { label: 'Feature Planning', path: '/feature-planning', icon: Activity },
+      { label: 'Tech Stack', path: '/tech-stack', icon: Cpu },
+      { label: 'Execution Score', path: '/impact', icon: Award }
     ]
   },
   {
-    title: 'BRAND & GROWTH',
-    links: [
-      { path: '/brand-creation', icon: Flame, label: 'Brand Creation' },
-      { path: '/gtm', icon: Compass, label: 'Marketing Strategy' },
-      { path: '/sales-strategy', icon: TrendingUp, label: 'Sales Strategy' },
-      { path: '/growth-advisor', icon: Zap, label: 'Growth Advisor' },
+    id: 'decisions',
+    title: 'Decisions',
+    icon: Target,
+    items: [
+      { label: 'Decision Center', path: '/dashboard', icon: Target },
+      { label: 'Decision History', path: '/decisions', icon: FileText },
+      { label: 'Experiments', path: '/experiments', icon: FlaskConical }
     ]
   },
   {
-    title: 'OPERATIONS',
-    links: [
-      { path: '/hiring-plan', icon: Users2, label: 'Hiring Plan' },
-      { path: '/legal', icon: Shield, label: 'Legal Guidance' },
-      { path: '/devils-advocate', icon: ShieldAlert, label: "Devil's Advocate" },
+    id: 'knowledge',
+    title: 'Knowledge',
+    icon: BookOpen,
+    items: [
+      { label: 'Document Generator', path: '/document-generator', icon: FileText },
+      { label: 'Documents & RAG', path: '/documents', icon: BookOpen }
     ]
   },
   {
-    title: 'LAUNCH & INVESTOR',
-    links: [
-      { path: '/launch-readiness', icon: CheckCircle2, label: 'KPI Dashboard' },
-      { path: '/investor-mode', icon: Award, label: 'Investor Mode' },
-      { path: '/pitch-deck', icon: Presentation, label: 'Pitch Deck' },
-      { path: '/document-generator', icon: FileText, label: 'Document Generator' },
-    ]
-  },
-  {
-    title: 'AI CO-FOUNDER',
-    links: [
-      { path: '/chat', icon: MessageSquare, label: 'AI Mentor Chat' },
-      { path: '/workspace-hub', icon: CheckCircle2, label: 'AI Action Center' },
-      { path: '/documents', icon: FileText, label: 'Documents & RAG' },
+    id: 'reports',
+    title: 'Reports',
+    icon: Presentation,
+    items: [
+      { label: 'Executive Report', path: '/dashboard', icon: FileText },
+      { label: 'Pitch Deck', path: '/pitch-deck', icon: Presentation }
     ]
   }
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.04,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, x: -15 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { type: 'spring', stiffness: 120, damping: 18 },
-  },
-};
-
-// Robot Mascot Component
-function RobotMascot() {
-  return (
-    <div className="relative w-12 h-12 flex-shrink-0">
-      <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
-        <defs>
-          <linearGradient id="botGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#A855F7" />
-            <stop offset="50%" stopColor="#EC4899" />
-            <stop offset="100%" stopColor="#6366F1" />
-          </linearGradient>
-          <linearGradient id="headGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#E9D5FF" />
-            <stop offset="100%" stopColor="#C084FC" />
-          </linearGradient>
-          <radialGradient id="eyeGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#38BDF8" />
-            <stop offset="100%" stopColor="#0284C7" />
-          </radialGradient>
-        </defs>
-        {/* Antenna */}
-        <line x1="50" y1="18" x2="50" y2="8" stroke="#EC4899" strokeWidth="4" strokeLinecap="round" />
-        <circle cx="50" cy="6" r="4" fill="#38BDF8" className="animate-pulse" />
-
-        {/* Body Base */}
-        <ellipse cx="50" cy="78" rx="26" ry="16" fill="url(#botGrad)" />
-
-        {/* Head */}
-        <rect x="22" y="18" width="56" height="46" rx="20" fill="url(#headGrad)" stroke="#FFFFFF" strokeWidth="2.5" />
-
-        {/* Screen/Face */}
-        <rect x="28" y="24" width="44" height="34" rx="14" fill="#1E1B4B" />
-
-        {/* Eyes */}
-        <ellipse cx="40" cy="40" rx="5" ry="6" fill="url(#eyeGlow)" />
-        <ellipse cx="60" cy="40" rx="5" ry="6" fill="url(#eyeGlow)" />
-        <circle cx="42" cy="38" r="1.5" fill="#FFFFFF" />
-        <circle cx="62" cy="38" r="1.5" fill="#FFFFFF" />
-
-        {/* Cute Smile */}
-        <path d="M 44 48 Q 50 53 56 48" fill="none" stroke="#38BDF8" strokeWidth="2" strokeLinecap="round" />
-
-        {/* Headphones / Ears */}
-        <rect x="16" y="30" width="8" height="22" rx="4" fill="#EC4899" />
-        <rect x="76" y="30" width="8" height="22" rx="4" fill="#EC4899" />
-      </svg>
-    </div>
-  );
-}
-
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [openSections, setOpenSections] = useState({
+    'ai-cofounder': true,
+    'startup': true,
+    'intelligence': false,
+    'strategy': false,
+    'build': false,
+    'decisions': false,
+    'knowledge': false,
+    'reports': false,
+  });
+
+  const toggleSection = (id) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
   return (
     <motion.aside
@@ -192,122 +168,176 @@ export default function Sidebar() {
       transition={{ type: 'spring', stiffness: 100, damping: 20 }}
       className="fixed left-0 top-0 h-screen w-80 flex flex-col z-50 overflow-hidden text-white shadow-2xl select-none"
       style={{
-        background: 'linear-gradient(180deg, #1c0235 0%, #310752 40%, #520b5e 75%, #690f63 100%)',
+        background: 'linear-gradient(180deg, #120326 0%, #240742 40%, #3d0954 75%, #520b5e 100%)',
       }}
     >
-      {/* Decorative Organic Wave & Glow Background Layers */}
+      {/* Decorative Glow Layers */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        {/* Ambient Glows */}
-        <div className="absolute -top-16 -left-16 w-64 h-64 bg-pink-600/30 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 -right-20 w-72 h-72 bg-purple-600/30 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 -left-10 w-60 h-60 bg-magenta-500/20 rounded-full blur-2xl" />
-
-        {/* Decorative Wave Graphics at Bottom */}
-        <svg className="absolute bottom-0 left-0 w-full h-80 opacity-30" viewBox="0 0 320 400" fill="none">
-          <path d="M-20 400 C 100 360, 150 280, 340 320 L 340 400 Z" fill="url(#waveGrad1)" />
-          <path d="M-20 400 C 80 310, 220 370, 340 260 L 340 400 Z" fill="url(#waveGrad2)" />
-          <defs>
-            <linearGradient id="waveGrad1" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#EC4899" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0.1" />
-            </linearGradient>
-            <linearGradient id="waveGrad2" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#D946EF" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-        </svg>
-
-        {/* Tiny Sparkle Accents */}
-        <Sparkles className="absolute top-1/2 left-4 w-3 h-3 text-purple-300/30" />
-        <Sparkles className="absolute bottom-44 right-8 w-3.5 h-3.5 text-pink-200/40" />
+        <div className="absolute -top-16 -left-16 w-64 h-64 bg-pink-600/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 -right-20 w-72 h-72 bg-purple-600/20 rounded-full blur-3xl" />
       </div>
 
       {/* Header / Brand */}
-      <div className="relative z-10 p-6 flex items-center justify-between border-b border-white/10">
+      <div className="relative z-10 p-5 flex items-center justify-between border-b border-white/10">
         <motion.div
           whileHover={{ scale: 1.02 }}
           className="flex items-center gap-3 cursor-pointer"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/dashboard')}
         >
-          <img src="/ideaexecutor_icon_white.png" alt="IdeaExecutor Logo" className="w-11 h-11 object-contain drop-shadow-lg" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-500 via-purple-600 to-indigo-500 p-0.5 shadow-lg shadow-pink-500/20">
+            <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+              <Rocket className="w-5 h-5 text-pink-400" />
+            </div>
+          </div>
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-white font-sans flex items-center gap-1.5">
+            <h1 className="text-xl font-extrabold tracking-tight text-white font-sans flex items-center gap-1">
               IdeaExecutor
             </h1>
-            <p className="text-[10px] text-pink-200 font-extrabold tracking-wider uppercase">
-              Turn Ideas into Reality with AI
+            <p className="text-[10px] text-pink-200/90 font-bold tracking-wider uppercase">
+              AI Startup Co-Founder
             </p>
           </div>
         </motion.div>
       </div>
 
-      {/* Navigation list */}
-      <motion.nav
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="relative z-10 flex-1 px-4 py-3 space-y-6 overflow-y-auto scrollbar-thin"
-      >
-        {groups.map((group, gIdx) => (
-          <div key={gIdx} className="space-y-2">
-            <span className="text-sm text-pink-200/90 font-black uppercase tracking-widest px-4 block select-none mb-3 mt-1">
-              {group.title}
-            </span>
-            {group.links.map(({ path, icon: Icon, label }) => {
-              const active = location.pathname === path || (path === '/dashboard' && location.pathname === '/');
-              return (
-                <motion.button
-                  key={path}
-                  variants={itemVariants}
-                  whileHover={{ x: 3, scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  onClick={() => navigate(path)}
-                  className={`w-full flex items-center justify-between px-4.5 py-4 rounded-xl text-base font-black transition-all duration-200 relative group cursor-pointer ${active
-                    ? 'bg-gradient-to-r from-[#e60067] via-[#ee2b7b] to-[#ff4e85] text-white shadow-lg shadow-pink-600/35'
-                    : 'text-pink-100/90 hover:text-white hover:bg-white/10'
-                    }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <Icon className={`w-6 h-6 transition-colors ${active ? 'text-white' : 'text-pink-200 group-hover:text-white'}`} />
-                    <span className="text-left text-base font-black tracking-wide">{label}</span>
-                  </div>
-                  {active && (
-                    <ChevronRight className="w-5 h-5 text-white/90" />
-                  )}
-                </motion.button>
-              );
-            })}
-          </div>
-        ))}
-      </motion.nav>
+      {/* Workflow Navigation */}
+      <nav className="relative z-10 flex-1 px-3 py-4 space-y-1.5 overflow-y-auto scrollbar-thin">
+        {workflowSections.map((section) => {
+          const Icon = section.icon;
 
-      {/* Bottom section */}
-      <div className="relative z-10 p-4 space-y-3.5 bg-black/20 backdrop-blur-xs border-t border-white/10">
-        {/* New Idea Analysis button */}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          if (section.isSingle) {
+            const active = location.pathname === section.path || (section.path === '/dashboard' && location.pathname === '/');
+            return (
+              <button
+                key={section.id}
+                onClick={() => navigate(section.path)}
+                className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+                  active
+                    ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-md shadow-pink-600/30'
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-pink-300'}`} />
+                  <span>{section.title}</span>
+                </div>
+              </button>
+            );
+          }
+
+          const isOpen = openSections[section.id];
+          const hasActiveChild = section.items?.some((item) => location.pathname === item.path);
+
+          return (
+            <div key={section.id} className="space-y-1">
+              {/* Section Header Accordion Trigger */}
+              <button
+                onClick={() => toggleSection(section.id)}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+                  hasActiveChild
+                    ? 'bg-white/10 text-white border-l-4 border-pink-500'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Icon className={`w-4 h-4 ${hasActiveChild ? 'text-pink-400' : 'text-purple-300'}`} />
+                  <span>{section.title}</span>
+                </div>
+                {isOpen ? (
+                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                )}
+              </button>
+
+              {/* Collapsible Submenu */}
+              <AnimatePresence initial={false}>
+                {isOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden pl-7 space-y-1"
+                  >
+                    {section.items.map((sub) => {
+                      const SubIcon = sub.icon;
+                      const active = location.pathname === sub.path;
+                      return (
+                        <button
+                          key={sub.label + sub.path}
+                          onClick={() => navigate(sub.path)}
+                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                            active
+                              ? 'bg-gradient-to-r from-pink-600/80 to-purple-600/80 text-white font-bold shadow-xs'
+                              : 'text-slate-400 hover:text-white hover:bg-white/5'
+                          }`}
+                        >
+                          <SubIcon className={`w-3.5 h-3.5 ${active ? 'text-white' : 'text-slate-400'}`} />
+                          <span className="truncate">{sub.label}</span>
+                        </button>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        })}
+      </nav>
+
+      {/* Action CTA Button */}
+      <div className="px-4 py-2 relative z-10">
+        <button
           onClick={() => navigate('/input')}
-          className="w-full flex items-center justify-center gap-3 px-4 py-4 rounded-2xl bg-gradient-to-r from-[#e60067] via-[#f02b7b] to-[#ff4e85] text-white font-black text-lg shadow-xl shadow-pink-600/40 hover:opacity-95 transition-all cursor-pointer border border-white/20"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-bold text-xs shadow-lg shadow-pink-600/30 hover:opacity-95 transition cursor-pointer border border-white/20"
         >
-          <Plus className="w-6 h-6 stroke-[3]" />
+          <Plus className="w-4 h-4" />
           <span>New Idea Analysis</span>
-        </motion.button>
+        </button>
+      </div>
 
-        {/* Logout button */}
-        <motion.button
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
-          onClick={() => {
-            localStorage.removeItem('token');
-            navigate('/login');
-          }}
-          className="w-full flex items-center gap-4 px-4.5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-black text-lg transition-all cursor-pointer"
-        >
-          <LogOut className="w-6 h-6 stroke-[2.5]" />
-          <span>Logout</span>
-        </motion.button>
+      {/* Footer Profile & Utility Links */}
+      <div className="relative z-10 p-4 bg-slate-950/60 backdrop-blur-sm border-t border-white/10 space-y-2">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => navigate('/workspace')}
+            className="flex items-center gap-2 text-xs text-slate-300 hover:text-white transition"
+          >
+            <Settings className="w-3.5 h-3.5" />
+            <span>Settings</span>
+          </button>
+          <button
+            onClick={() => navigate('/notifications')}
+            className="flex items-center gap-2 text-xs text-slate-300 hover:text-white transition"
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span>Help</span>
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between pt-2 border-t border-white/10">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center font-extrabold text-xs text-white">
+              S
+            </div>
+            <div>
+              <div className="text-xs font-bold text-white">Swasthiga</div>
+              <div className="text-[10px] text-slate-400">Founder</div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              localStorage.removeItem('token');
+              navigate('/login');
+            }}
+            className="p-1.5 text-slate-400 hover:text-rose-400 transition"
+            title="Logout"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </motion.aside>
   );

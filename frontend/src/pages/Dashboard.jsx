@@ -6,7 +6,11 @@ import ConfidenceScoreBadge from '../components/ConfidenceScoreBadge';
 import ActionItemsChecklist from '../components/ActionItemsChecklist';
 import MentorSuggestionsCard from '../components/MentorSuggestionsCard';
 import ExportCenter from '../components/ExportCenter';
-import TaskTracker from '../components/TaskTracker';
+import StartupHealthScore from '../components/StartupHealthScore';
+import AIDecisionCenter from '../components/AIDecisionCenter';
+import AICofounderTeam from '../components/AICofounderTeam';
+import MorningBrief from '../components/MorningBrief';
+import FounderScorecard from '../components/FounderScorecard';
 
 import {
   Rocket, Sparkles, Zap, Brain, TrendingUp, Users, Target, Briefcase,
@@ -135,7 +139,21 @@ function OverviewTab({ analysis }) {
 
   return (
     <div className="space-y-6 text-left">
-      
+      {/* AI Co-Founder Morning Brief */}
+      <MorningBrief />
+
+      {/* Founder Scorecard */}
+      <FounderScorecard />
+
+      {/* AI Decision Center 2.0 */}
+      <AIDecisionCenter decisionData={analysis?.decision_center} />
+
+      {/* Startup Health Score 2.0 */}
+      <StartupHealthScore healthDetails={analysis?.health_details} overallScore={analysis?.health_score || 78} />
+
+      {/* Virtual AI Co-Founder Team */}
+      <AICofounderTeam />
+
       {/* Real Startup Metrics Bar */}
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
         <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-3">Live Startup Financial & Growth Metrics</h3>

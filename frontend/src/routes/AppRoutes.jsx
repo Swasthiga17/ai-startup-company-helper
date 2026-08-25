@@ -44,9 +44,13 @@ import SalesStrategy from '../pages/SalesStrategy';
 import HiringPlan from '../pages/HiringPlan';
 import TechStack from '../pages/TechStack';
 import GrowthAdvisor from '../pages/GrowthAdvisor';
+import Decisions from '../pages/Decisions';
+import Experiments from '../pages/Experiments';
 
 const titles = {
   '/dashboard': 'Executive Summary',
+  '/decisions': 'Founder Decision Log',
+  '/experiments': 'Startup Experiments',
   '/problem-validation': 'Problem Validation',
   '/target-customers': 'Target Customers',
   '/value-prop': 'Value Proposition',
@@ -129,6 +133,8 @@ export default function AppRoutes() {
       {/* Premium Route bindings */}
       <Route path="/workspace" element={<ProtectedRoute><Layout title="Workspace"><Workspace /></Layout></ProtectedRoute>} />
       <Route path="/workspace-hub" element={<ProtectedRoute><Layout title={titles['/workspace-hub']}><WorkspaceHub /></Layout></ProtectedRoute>} />
+      <Route path="/decisions" element={<ProtectedRoute><Layout title={titles['/decisions']}><Decisions /></Layout></ProtectedRoute>} />
+      <Route path="/experiments" element={<ProtectedRoute><Layout title={titles['/experiments']}><Experiments /></Layout></ProtectedRoute>} />
       <Route path="/investor-readiness" element={<ProtectedRoute><Layout title={titles['/investor-readiness']}><InvestorReadiness /></Layout></ProtectedRoute>} />
       <Route path="/pricing" element={<ProtectedRoute><Layout title="Pricing Plans"><Pricing /></Layout></ProtectedRoute>} />
       <Route path="/notifications" element={<ProtectedRoute><Layout title="Notifications"><Notifications /></Layout></ProtectedRoute>} />
