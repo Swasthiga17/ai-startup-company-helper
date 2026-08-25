@@ -46,9 +46,13 @@ import TechStack from '../pages/TechStack';
 import GrowthAdvisor from '../pages/GrowthAdvisor';
 import Decisions from '../pages/Decisions';
 import Experiments from '../pages/Experiments';
+import ProductMarketFitDashboard from '../pages/ProductMarketFitDashboard';
+import BusinessIntelligenceDashboard from '../pages/BusinessIntelligenceDashboard';
 
 const titles = {
   '/dashboard': 'Executive Summary',
+  '/pmf': 'Product-Market Fit Dashboard',
+  '/business-intelligence': 'Business Intelligence Dashboard',
   '/decisions': 'Founder Decision Log',
   '/experiments': 'Startup Experiments',
   '/problem-validation': 'Problem Validation',
@@ -135,6 +139,8 @@ export default function AppRoutes() {
       <Route path="/workspace-hub" element={<ProtectedRoute><Layout title={titles['/workspace-hub']}><WorkspaceHub /></Layout></ProtectedRoute>} />
       <Route path="/decisions" element={<ProtectedRoute><Layout title={titles['/decisions']}><Decisions /></Layout></ProtectedRoute>} />
       <Route path="/experiments" element={<ProtectedRoute><Layout title={titles['/experiments']}><Experiments /></Layout></ProtectedRoute>} />
+      <Route path="/pmf" element={<ProtectedRoute><Layout title={titles['/pmf']}><ProductMarketFitDashboard /></Layout></ProtectedRoute>} />
+      <Route path="/business-intelligence" element={<ProtectedRoute><Layout title={titles['/business-intelligence']}><BusinessIntelligenceDashboard /></Layout></ProtectedRoute>} />
       <Route path="/investor-readiness" element={<ProtectedRoute><Layout title={titles['/investor-readiness']}><InvestorReadiness /></Layout></ProtectedRoute>} />
       <Route path="/pricing" element={<ProtectedRoute><Layout title="Pricing Plans"><Pricing /></Layout></ProtectedRoute>} />
       <Route path="/notifications" element={<ProtectedRoute><Layout title="Notifications"><Notifications /></Layout></ProtectedRoute>} />
