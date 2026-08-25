@@ -75,12 +75,7 @@ export default function Register() {
         throw new Error(data?.detail || data?.error || `Registration failed (Server error ${resp.status})`);
       }
 
-      if (!data.access_token) {
-        throw new Error('Invalid response from server. Missing access token.');
-      }
-
-      localStorage.setItem('token', data.access_token);
-      navigate('/onboarding');
+      navigate('/login', { state: { message: 'Account created successfully! Please sign in with your credentials.' } });
     } catch (err) {
       if (err.name === 'SyntaxError' || err.message?.includes('Unexpected token') || err.message?.includes('JSON')) {
         setError('Unable to connect to server. Please ensure the backend server is running on port 8000.');

@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Lock, Eye, EyeOff, ArrowRight, Lightbulb, Target, TrendingUp } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, ArrowRight, Lightbulb, Target, TrendingUp, CheckCircle2 } from 'lucide-react';
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState(location.state?.message || '');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -142,6 +144,13 @@ export default function Login() {
               Login to your account
             </p>
           </div>
+
+          {successMsg && (
+            <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-2xl text-xs font-semibold text-center flex items-center justify-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+              <span>{successMsg}</span>
+            </div>
+          )}
 
           {error && (
             <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-600 rounded-2xl text-xs font-semibold text-center">
