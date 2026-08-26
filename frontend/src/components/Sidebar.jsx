@@ -184,11 +184,11 @@ export default function Sidebar() {
           className="flex items-center gap-3 cursor-pointer"
           onClick={() => navigate('/dashboard')}
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-500 via-purple-600 to-indigo-500 p-0.5 shadow-lg shadow-pink-500/20">
-            <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-              <Rocket className="w-5 h-5 text-pink-400" />
-            </div>
-          </div>
+          <img
+            src="/ideaexecutor_icon.png"
+            alt="IdeaExecutor Logo"
+            className="w-10 h-10 object-contain rounded-xl shadow-lg shadow-pink-500/25 border border-white/20 bg-white/10 p-1 backdrop-blur-sm"
+          />
           <div>
             <h1 className="text-xl font-extrabold tracking-tight text-white font-sans flex items-center gap-1">
               IdeaExecutor
