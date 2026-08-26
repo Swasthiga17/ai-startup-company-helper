@@ -11,6 +11,7 @@ import AIDecisionCenter from '../components/AIDecisionCenter';
 import AICofounderTeam from '../components/AICofounderTeam';
 import MorningBrief from '../components/MorningBrief';
 import FounderScorecard from '../components/FounderScorecard';
+import TaskTracker from '../components/TaskTracker';
 
 import {
   Rocket, Sparkles, Zap, Brain, TrendingUp, Users, Target, Briefcase,
