@@ -46,7 +46,12 @@ app = FastAPI(
 cors_origins_env = os.environ.get("CORS_ORIGINS", "")
 if cors_origins_env and cors_origins_env.strip() != "*":
     allowed_origins = [origin.strip() for origin in cors_origins_env.split(",") if origin.strip()]
-    for default_origin in ["https://buildyourowncompanyusingaibss.netlify.app", "https://ideaexecutor.onrender.com"]:
+    for default_origin in [
+        "https://buildyourowncompanyusingaibss.netlify.app",
+        "https://ideaexecutor.onrender.com",
+        "https://ai-startup-company-helpe.onrender.com",
+        "https://ai-startup-company-helper.onrender.com"
+    ]:
         if default_origin not in allowed_origins:
             allowed_origins.append(default_origin)
 elif cors_origins_env.strip() == "*":
@@ -61,7 +66,9 @@ else:
         "http://localhost:8000",
         "http://127.0.0.1:8000",
         "https://buildyourowncompanyusingaibss.netlify.app",
-        "https://ideaexecutor.onrender.com"
+        "https://ideaexecutor.onrender.com",
+        "https://ai-startup-company-helpe.onrender.com",
+        "https://ai-startup-company-helper.onrender.com"
     ]
 
 app.add_middleware(
