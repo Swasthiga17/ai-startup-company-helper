@@ -40,7 +40,7 @@ const MOCK_HISTORICAL_DATA = [
 ];
 
 const MOCK_COMPETITORS = [
-  { name: 'startupGenie', featureA: 'Yes', featureB: '8 Agents', featureC: 'SQLite/Postgres', price: 'Free / $29' },
+  { name: 'IdeaExecutor', featureA: 'Yes', featureB: '8 Agents', featureC: 'SQLite/Postgres', price: 'Free / $29' },
   { name: 'Competitor Alpha', featureA: 'Yes', featureB: 'Single Chat', featureC: 'Postgres Only', price: '$49/mo' },
   { name: 'Competitor Beta', featureA: 'No', featureB: 'Static Templates', featureC: 'None', price: 'Free' },
 ];
@@ -60,7 +60,7 @@ export default function FigmaShowcase() {
   const [activeTab, setActiveTab] = useState('TAM');
   const [selectedSlide, setSelectedSlide] = useState(1);
   const [chatMessages, setChatMessages] = useState([
-    { sender: 'ai', text: 'Hello Alex! I am your startupGenie assistant. What startup idea are we validating today?' }
+    { sender: 'ai', text: 'Hello Alex! I am your IdeaExecutor assistant. What startup idea are we validating today?' }
   ]);
   const [chatInput, setChatInput] = useState('');
   const [agentProgress, setAgentProgress] = useState({
@@ -91,7 +91,7 @@ export default function FigmaShowcase() {
     { id: '18 Startup Score', title: 'Startup Score Matrix', type: 'desktop', category: 'Agentic Analysis', desc: 'Radar assessment of 6 critical startup dimensions.' },
     { id: '19 Investor Readiness', title: 'Investor Checklists', type: 'desktop', category: 'Agentic Analysis', desc: 'Investor qualification checks and scorecards.' },
     { id: '20 AI Suggestions', title: 'Actionable Advice', type: 'desktop', category: 'Agentic Analysis', desc: 'Growth recommendations & risk mitigations.' },
-    { id: '21 Chat', title: 'startupGenie AI Chat', type: 'desktop', category: 'Core Workspace', desc: 'Interactive conversational chat workspace.' },
+    { id: '21 Chat', title: 'IdeaExecutor AI Chat', type: 'desktop', category: 'Core Workspace', desc: 'Interactive conversational chat workspace.' },
     { id: '22 Reports', title: 'Reports Hub', type: 'desktop', category: 'Reports & Collaboration', desc: 'Export interface for generated analyses.' },
     { id: '23 PDF Viewer', title: 'Interactive PDF Preview', type: 'desktop', category: 'Reports & Collaboration', desc: 'Preview and print controls for PDF briefs.' },
     { id: '24 PPT Viewer', title: 'Pitch Deck Viewer', type: 'desktop', category: 'Reports & Collaboration', desc: 'Interactive slide deck reviewer.' },
@@ -168,7 +168,7 @@ export default function FigmaShowcase() {
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-[#502AF6] to-[#F1358F] flex items-center justify-center shadow-lg shadow-violet-650/20 mb-6 animate-pulse">
                 <Sparkles className="w-10 h-10 text-white" />
               </div>
-              <h2 className="text-3xl font-black text-white tracking-tight">startupGenie</h2>
+              <h2 className="text-3xl font-black text-white tracking-tight">IdeaExecutor</h2>
               <span className="text-[10px] text-violet-400 font-bold uppercase tracking-widest mt-2 block">Your AI Co-Founder</span>
             </div>
             <div className="space-y-3 pb-8 z-10 w-full">
@@ -301,10 +301,10 @@ export default function FigmaShowcase() {
         return (
           <div className="w-full h-full bg-[#080b18] p-8 text-left flex flex-col justify-between select-none">
             <div className="space-y-3">
-              <span className="text-xs font-black text-violet-400">startupGenie</span>
+              <span className="text-xs font-black text-violet-400">IdeaExecutor</span>
               <div className="space-y-1">
                 <h3 className="text-lg font-black text-white">Create Account</h3>
-                <p className="text-[9px] text-slate-500 font-semibold">Join thousands of founders using startupGenie</p>
+                <p className="text-[9px] text-slate-500 font-semibold">Join thousands of founders using IdeaExecutor</p>
               </div>
               <div className="space-y-2.5 pt-1 text-[9px] font-bold text-slate-400">
                 <div className="space-y-1">
@@ -336,7 +336,7 @@ export default function FigmaShowcase() {
               <div className="space-y-4">
                 <div className="flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4 text-violet-500" />
-                  <span className="font-extrabold text-[10px] text-white">startupGenie</span>
+                  <span className="font-extrabold text-[10px] text-white">IdeaExecutor</span>
                 </div>
                 <div className="space-y-1.5 text-[9px] font-bold text-slate-450">
                   <div className="px-2.5 py-1.5 rounded bg-violet-600/10 text-violet-400 flex items-center gap-1.5"><LayoutDashboard className="w-3.5 h-3.5" /> Dashboard</div>
@@ -860,7 +860,7 @@ export default function FigmaShowcase() {
             <div className="flex-1 bg-[#131732]/40 rounded-lg border border-dashed border-slate-800/80 p-4 my-2 overflow-y-auto space-y-3">
               <div className="text-center space-y-1 border-b border-slate-800/80 pb-2">
                 <h4 className="text-[10px] font-black text-white uppercase">EduAI Platform Validation Report</h4>
-                <p className="text-[7px] text-slate-500">Prepared by startupGenie Analyst Agents</p>
+                <p className="text-[7px] text-slate-500">Prepared by IdeaExecutor Analyst Agents</p>
               </div>
               <div className="space-y-1.5 text-[7px] text-slate-400 leading-relaxed">
                 <h5 className="font-extrabold text-white uppercase">1. Introduction & Market Sizing</h5>
@@ -905,7 +905,7 @@ export default function FigmaShowcase() {
                   <p className="text-[7.5px] text-slate-400">High Product-market fit; high technology readiness index score.</p>
                 </div>
               )}
-              <span className="text-[6px] text-slate-600 block">startupGenie Pitch slide {selectedSlide}</span>
+              <span className="text-[6px] text-slate-600 block">IdeaExecutor Pitch slide {selectedSlide}</span>
             </div>
           </div>
         );
@@ -1104,7 +1104,7 @@ export default function FigmaShowcase() {
           </div>
           <div>
             <h1 className="font-extrabold text-sm tracking-tight text-white flex items-center gap-2">
-              <span>startupGenie Interactive Canvas</span>
+              <span>IdeaExecutor Interactive Canvas</span>
               <span className="px-2 py-0.5 rounded bg-violet-600/20 text-violet-400 text-[9px] font-semibold border border-violet-500/10">30 Artboards</span>
             </h1>
           </div>

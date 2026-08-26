@@ -54,7 +54,7 @@ export default function OnboardingShowcase() {
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
-            <span className="font-extrabold text-white text-base tracking-tight block">StartupGenie AI</span>
+            <span className="font-extrabold text-white text-base tracking-tight block">IdeaExecutor AI</span>
             <span className="text-[9px] text-purple-400 font-bold tracking-wider -mt-1 block uppercase">Onboarding Showcase</span>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function OnboardingShowcase() {
         <span>Desktop Mockup Grid: 1440 × 1024 px</span>
         <span className="flex items-center gap-1.5 text-purple-300">
           <Star className="w-3.5 h-3.5 fill-purple-300 text-transparent" />
-          <span>Figma Presentation Quality • StartupGenie AI v1.0</span>
+          <span>Figma Presentation Quality • IdeaExecutor AI v1.0</span>
         </span>
       </footer>
     </div>
@@ -178,7 +178,7 @@ function ScreenHero() {
           <div className="space-y-3">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[8px] font-bold uppercase tracking-widest text-purple-300">
               <Star className="w-2.5 h-2.5 text-purple-400" />
-              <span>StartupGenie AI • From Idea to Investment.</span>
+              <span>IdeaExecutor AI • From Idea to Investment.</span>
             </div>
             
             <h1 className="text-4xl lg:text-5xl font-black tracking-tight leading-tight">
@@ -266,7 +266,7 @@ function ScreenHero() {
             {/* Dashboard Footer */}
             <div className="flex justify-between items-center pt-2 border-t border-white/5 text-[8px] font-black uppercase text-purple-300 tracking-wider">
               <span>System active</span>
-              <span>StartupGenie AI v2.0</span>
+              <span>IdeaExecutor AI v2.0</span>
             </div>
           </div>
 
@@ -682,7 +682,7 @@ function ScreenCTA() {
           </h2>
 
           <p className="text-xs text-white/60 leading-relaxed font-semibold max-w-lg mx-auto">
-            Thousands of founders start with an idea. Successful founders execute with StartupGenie. Get your AI Co-Founder today.
+            Thousands of founders start with an idea. Successful founders execute with IdeaExecutor. Get your AI Co-Founder today.
           </p>
         </div>
 
@@ -720,7 +720,7 @@ function ScreenCTA() {
 
       {/* Footer copyright */}
       <div className="border-t border-white/5 pt-4 text-[10px] text-white/30 uppercase tracking-widest font-black">
-        Trusted by ambitious founders worldwide • © 2026 StartupGenie Inc.
+        Trusted by ambitious founders worldwide • © 2026 IdeaExecutor Inc.
       </div>
 
     </motion.div>

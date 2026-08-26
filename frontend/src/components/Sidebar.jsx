@@ -66,11 +66,12 @@ const workflowSections = [
     icon: Lightbulb,
     defaultOpen: true,
     items: [
-      { label: 'My Startup', path: '/input', icon: Rocket },
+      { label: 'Startup Overview', path: '/dashboard', icon: Rocket },
       { label: 'Idea Validation', path: '/problem-validation', icon: CheckCircle2 },
       { label: 'Value Prop', path: '/value-prop', icon: Sparkles },
       { label: 'Customer Personas', path: '/target-customers', icon: Users },
-      { label: 'Startup Health', path: '/launch-readiness', icon: Activity }
+      { label: 'Startup Health', path: '/launch-readiness', icon: Activity },
+      { label: 'Edit Idea & Parameters', path: '/input', icon: Lightbulb }
     ]
   },
   {
