@@ -21,4 +21,5 @@ pydantic
 pydantic-settings
 email-validator
 python-socketio
+python-multipart
 
