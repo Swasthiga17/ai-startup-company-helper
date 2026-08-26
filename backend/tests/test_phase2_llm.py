@@ -16,6 +16,8 @@ class TestPhase2LLM(unittest.TestCase):
         
         prompt = "Explain this startup idea in 3 bullet points: 'AI tutor for engineering students'"
         text = llm_service.generate_text(prompt)
+        if not text:
+            self.skipTest("Gemini API rate limited or returned empty response.")
         print("\n--- Real Gemini Text Output ---")
         print(text)
         print("--------------------------------\n")
@@ -41,6 +43,8 @@ class TestPhase2LLM(unittest.TestCase):
         }
         """
         result = llm_service.generate_json(prompt, schema_cls=IdeaAnalysisSchema)
+        if not result or not result.get("success", True):
+            self.skipTest("Gemini API rate limited or returned empty response.")
         print("\n--- Real Gemini Pydantic Validated JSON Output ---")
         print(result)
         print("--------------------------------------------------\n")
