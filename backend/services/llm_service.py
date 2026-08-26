@@ -28,7 +28,7 @@ class LLMService:
         self.client = None
         self.available = False
         self.sdk_type = None  # "modern" or "legacy"
-        self.fallback_models = ["gemini-2.5-flash", "gemini-2.5-pro"]
+        self.fallback_models = ["gemini-2.5-flash", "gemini-3.6-flash", "gemini-3.1-pro-preview"]
         self._initialize()
 
     def _initialize(self):
