@@ -185,9 +185,9 @@ export default function Sidebar() {
           onClick={() => navigate('/dashboard')}
         >
           <img
-            src="/ideaexecutor_icon.png"
+            src="/ideaexecutor_icon_white.png"
             alt="IdeaExecutor Logo"
-            className="w-10 h-10 object-contain rounded-xl shadow-lg shadow-pink-500/25 border border-white/20 bg-white/10 p-1 backdrop-blur-sm"
+            className="w-10 h-10 object-contain rounded-xl shadow-md border border-white/20 bg-white/10 p-1.5 backdrop-blur-sm"
           />
           <div>
             <h1 className="text-xl font-extrabold tracking-tight text-white font-sans flex items-center gap-1">
