@@ -81,16 +81,6 @@ export default function TopBar({ title }) {
           <span>PDF</span>
         </motion.button>
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={downloadPptx || (() => alert('Downloading Pitch Deck PPTX...'))}
-          className="h-9 flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium text-white bg-white/10 hover:bg-white/20 border border-white/20 shadow-xs transition cursor-pointer backdrop-blur-md"
-        >
-          <Presentation className="w-3.5 h-3.5 text-purple-300" />
-          <span>Pitch Deck</span>
-        </motion.button>
-
         <div className="h-5 w-px bg-white/15 mx-0.5" />
 
         <motion.button
