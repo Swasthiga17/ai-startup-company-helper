@@ -63,22 +63,43 @@ function AnimatedNumber({ value, suffix = '' }) {
 
 /* ─── KPI Card ─── */
 function KpiCard({ kpi }) {
+  const isStringValue = String(kpi.value).includes('$') || String(kpi.value).includes('%') || isNaN(parseFloat(kpi.value));
+  const isLongText = String(kpi.value).length > 14;
+
   return (
-    <motion.div whileHover={{ y: -4, scale: 1.01 }} className="glass-card p-5 relative overflow-hidden group bg-white border border-slate-100 shadow-sm">
-      <div className="relative">
-        <div className="flex items-center justify-between mb-3">
-          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${kpi.color} flex items-center justify-center shadow-sm`}>
-            <kpi.icon className="w-5 h-5 text-white" />
-          </div>
-          <span className={`text-xs font-bold flex items-center gap-0.5 ${kpi.dir === 'up' ? 'text-emerald-650 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100' : 'text-red-650 bg-red-50 px-2 py-0.5 rounded-full border border-red-100'}`}>
-            {kpi.dir === 'up' ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
-            {kpi.trend}
-          </span>
+    <motion.div
+      whileHover={{ y: -2, scale: 1.01 }}
+      className="glass-card p-3.5 sm:p-4 rounded-xl bg-white border border-slate-100 shadow-xs h-[142px] flex flex-col justify-between overflow-hidden relative group"
+    >
+      <div className="flex items-center justify-between gap-2">
+        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${kpi.color} flex items-center justify-center shadow-xs shrink-0`}>
+          <kpi.icon className="w-4 h-4 text-white" />
         </div>
-        <p className="text-2xl font-black text-slate-800 mb-1">
-          {String(kpi.value).includes('$') || String(kpi.value).includes('%') || isNaN(parseFloat(kpi.value)) ? kpi.value : <AnimatedNumber value={kpi.value} />}
+        <span className={`text-[10px] font-bold flex items-center gap-0.5 px-1.5 py-0.5 rounded-md shrink-0 ${
+          kpi.dir === 'up'
+            ? 'text-emerald-700 bg-emerald-50 border border-emerald-100'
+            : 'text-red-700 bg-red-50 border border-red-100'
+        }`}>
+          {kpi.dir === 'up' ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+          {kpi.trend}
+        </span>
+      </div>
+
+      <div className="my-auto py-1">
+        <p
+          className={`font-black text-slate-800 tracking-tight leading-tight ${
+            isLongText ? 'text-base sm:text-lg line-clamp-2' : 'text-2xl sm:text-[26px] truncate'
+          }`}
+          title={String(kpi.value)}
+        >
+          {isStringValue ? kpi.value : <AnimatedNumber value={kpi.value} />}
         </p>
-        <p className="text-xs text-slate-450 font-bold uppercase tracking-wider">{kpi.label}</p>
+      </div>
+
+      <div>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate">
+          {kpi.label}
+        </p>
       </div>
     </motion.div>
   );
@@ -87,19 +108,32 @@ function KpiCard({ kpi }) {
 /* ─── Agent Status Bar ─── */
 function AgentBar({ running }) {
   return (
-    <div className="glass-card p-4 bg-slate-50/50 border border-slate-100 shadow-sm">
-      <div className="flex items-center gap-2 mb-3">
-        <Cpu className="w-4 h-4 text-violet-500 animate-pulse" />
-        <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">AI Agents Status</span>
-        {running && <div className="flex items-center gap-1.5 ml-auto"><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" /><span className="text-[10px] text-emerald-700 font-extrabold">All Systems Active</span></div>}
+    <div className="glass-card px-3.5 py-2.5 rounded-xl bg-slate-50/70 border border-slate-100/80 shadow-xs">
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <div className="flex items-center gap-1.5">
+          <Cpu className="w-3.5 h-3.5 text-violet-500 animate-pulse" />
+          <span className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">AI Agents Status</span>
+        </div>
+        {running && (
+          <div className="flex items-center gap-1">
+            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="text-[9px] text-emerald-700 font-extrabold uppercase tracking-wide">All Systems Active</span>
+          </div>
+        )}
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1.5">
         {agents.map((a, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-            className="flex items-center gap-2 p-2 rounded-xl bg-white border border-slate-100 shadow-sm"
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.03 }}
+            className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white border border-slate-100/80 shadow-xs"
           >
-            <div className={`w-1.5 h-1.5 rounded-full ${a.status === 'active' ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]' : 'bg-slate-350'}`} />
-            <span className="text-[10px] text-slate-650 font-bold truncate">{a.name.replace(' Agent', '')}</span>
+            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${a.status === 'active' ? 'bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]' : 'bg-slate-300'}`} />
+            <span className="text-[10px] text-slate-700 font-bold truncate leading-none">
+              {a.name.replace(' Agent', '')}
+            </span>
           </motion.div>
         ))}
       </div>
@@ -110,9 +144,13 @@ function AgentBar({ running }) {
 /* ─── Tab Button ─── */
 function TabBtn({ tab, active, onClick }) {
   return (
-    <motion.button whileHover={{ y: -1 }} whileTap={{ scale: 0.97 }}
+    <motion.button
+      whileHover={{ y: -1 }}
+      whileTap={{ scale: 0.97 }}
       onClick={() => onClick(tab)}
-      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap border border-transparent cursor-pointer ${active ? 'tab-active shadow-sm' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'}`}
+      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap border border-transparent cursor-pointer ${
+        active ? 'tab-active shadow-xs' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
+      }`}
     >
       {tab}
     </motion.button>
@@ -139,7 +177,7 @@ function OverviewTab({ analysis }) {
   ];
 
   return (
-    <div className="space-y-6 text-left">
+    <div className="space-y-4 text-left">
       {/* AI Co-Founder Morning Brief */}
       <MorningBrief />
 
@@ -156,9 +194,9 @@ function OverviewTab({ analysis }) {
       <AICofounderTeam />
 
       {/* Real Startup Metrics Bar */}
-      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
-        <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-3">Live Startup Financial & Growth Metrics</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-100/90 shadow-xs">
+        <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-2.5">Live Startup Financial & Growth Metrics</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
           {[
             { label: 'MRR', val: metrics.mrr, col: 'text-indigo-600' },
             { label: 'ARR', val: metrics.arr, col: 'text-purple-600' },
@@ -169,7 +207,7 @@ function OverviewTab({ analysis }) {
             { label: 'Churn', val: metrics.churn_rate, col: 'text-slate-700' },
             { label: 'Margin', val: metrics.gross_margin, col: 'text-blue-600' },
           ].map((m, i) => (
-            <div key={i} className="p-3 rounded-2xl bg-slate-50/60 border border-slate-100 text-center">
+            <div key={i} className="p-2 rounded-lg bg-slate-50/70 border border-slate-100 text-center">
               <span className="text-[9px] font-extrabold uppercase text-slate-400 block">{m.label}</span>
               <span className={`text-xs font-black font-mono mt-0.5 block ${m.col}`}>{m.val}</span>
             </div>
@@ -178,23 +216,23 @@ function OverviewTab({ analysis }) {
       </motion.div>
 
       {/* Health Score & Radar */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Startup Score */}
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="glass-card p-6 bg-white border border-slate-100 shadow-sm flex flex-col justify-between">
+        <motion.div initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} className="glass-card p-4 bg-white border border-slate-100/90 shadow-xs rounded-xl flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Brain className="w-5 h-5 text-violet-500 animate-pulse" />
+                <Brain className="w-4 h-4 text-violet-500 animate-pulse" />
                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Startup Health Score</h3>
               </div>
-              <span className="text-xs font-black px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200">
+              <span className="text-[11px] font-black px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200">
                 Overall: {health.overall}%
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 mb-3">
               {Object.entries(health.breakdown || {}).map(([key, val], idx) => (
-                <div key={idx} className="p-2.5 rounded-xl border border-slate-100 bg-slate-50/50 text-center">
+                <div key={idx} className="p-2 rounded-lg border border-slate-100 bg-slate-50/60 text-center">
                   <span className="text-[9px] font-extrabold uppercase text-slate-400 block truncate">{key.replace('_', ' ')}</span>
                   <span className="text-xs font-black text-slate-800">{val}%</span>
                 </div>
@@ -202,21 +240,21 @@ function OverviewTab({ analysis }) {
             </div>
           </div>
           {analysis?.score?.summary && (
-            <p className="text-xs text-slate-500 font-semibold text-center max-w-xs mx-auto">{analysis.score.summary}</p>
+            <p className="text-[11px] text-slate-500 font-medium text-center max-w-xs mx-auto">{analysis.score.summary}</p>
           )}
         </motion.div>
 
         {/* Radar Analysis */}
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="glass-card p-6 bg-white border border-slate-100 shadow-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <RadarIcon className="w-5 h-5 text-pink-500 animate-pulse" />
+        <motion.div initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} className="glass-card p-4 bg-white border border-slate-100/90 shadow-xs rounded-xl">
+          <div className="flex items-center gap-2 mb-3">
+            <RadarIcon className="w-4 h-4 text-pink-500 animate-pulse" />
             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">RADAR ANALYSIS</h3>
           </div>
-          <ResponsiveContainer width="100%" height={210}>
+          <ResponsiveContainer width="100%" height={180}>
             <RadarChart data={radarData}>
               <PolarGrid stroke="rgba(99,102,241,0.08)" />
-              <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 10, fontWeight: 600 }} />
-              <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#94a3b8', fontSize: 9 }} />
+              <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 9, fontWeight: 600 }} />
+              <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#94a3b8', fontSize: 8 }} />
               <Radar name="Score" dataKey="A" stroke="#502AF6" fill="#502AF6" fillOpacity={0.15} strokeWidth={2} />
             </RadarChart>
           </ResponsiveContainer>
@@ -224,7 +262,7 @@ function OverviewTab({ analysis }) {
       </div>
 
       {/* Action Items & Mentor Recommendations */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <ActionItemsChecklist items={analysis?.action_items || [
           "Interview 10 target customers to validate pain severity",
           "Set up landing page waitlist and core messaging",
@@ -801,24 +839,24 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6 text-left">
+    <div className="space-y-4 text-left">
       {/* Title widget card */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-6 bg-white border border-slate-100 shadow-sm relative overflow-hidden">
-        <div className="relative flex items-center justify-between mb-6 flex-wrap gap-4">
+      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4 sm:p-5 bg-white border border-slate-100/90 shadow-xs rounded-2xl relative overflow-hidden mb-3">
+        <div className="relative flex items-center justify-between mb-3.5 flex-wrap gap-2.5">
           <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <Rocket className="w-5 h-5 text-violet-500 animate-pulse" />
-              <h2 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-pink-500 bg-clip-text text-transparent">IdeaExecutor</h2>
-              <span className="text-[9px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-100 font-extrabold uppercase tracking-wider">AI CO-FOUNDER</span>
+            <div className="flex items-center gap-2 mb-1">
+              <Rocket className="w-4 h-4 text-violet-500 animate-pulse" />
+              <h2 className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-pink-500 bg-clip-text text-transparent">IdeaExecutor</h2>
+              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-100 font-extrabold uppercase tracking-wider">AI CO-FOUNDER</span>
             </div>
-            <p className="text-xs text-slate-450 font-semibold">Analysis for: <span className="text-slate-800 font-bold">"{analysis.idea?.substring(0, 50)}"</span></p>
+            <p className="text-[11px] text-slate-500 font-medium">Analysis for: <span className="text-slate-800 font-bold">"{analysis.idea?.substring(0, 55)}"</span></p>
           </div>
           <div className="flex items-center gap-2">
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={downloadPdf}
-              className="flex items-center gap-2 px-4 py-2 border border-slate-200 text-xs font-bold text-slate-650 hover:bg-slate-50 rounded-xl transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 text-xs font-semibold text-slate-650 hover:bg-slate-50 rounded-lg transition cursor-pointer"
             >
               <FileDown className="w-3.5 h-3.5 text-slate-500" />
               <span>PDF</span>
@@ -827,7 +865,7 @@ export default function Dashboard() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={downloadPptx}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#502AF6] to-[#F1358F] text-white text-xs font-bold rounded-xl shadow transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#502AF6] to-[#F1358F] text-white text-xs font-bold rounded-lg shadow-xs transition cursor-pointer"
             >
               <FileDown className="w-3.5 h-3.5" />
               <span>PPTX</span>
@@ -835,8 +873,8 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* KPI Cards — Live Data */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-5">
+        {/* KPI Cards — 4 in one row on desktop */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3.5">
           {liveKpis.map((kpi, i) => <KpiCard key={i} kpi={kpi} />)}
         </div>
 
@@ -845,7 +883,7 @@ export default function Dashboard() {
       </motion.div>
 
       {/* Navigation tabs */}
-      <div className="flex gap-1 overflow-x-auto pb-1.5 scrollbar-thin border-b border-slate-100/50">
+      <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-thin border-b border-slate-100/60">
         {tabs.map(t => <TabBtn key={t} tab={t} active={activeTab === t} onClick={setActiveTab} />)}
       </div>
 

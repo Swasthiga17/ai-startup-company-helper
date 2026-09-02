@@ -164,37 +164,37 @@ export default function Sidebar() {
 
   return (
     <motion.aside
-      initial={{ x: -280 }}
+      initial={{ x: -260 }}
       animate={{ x: 0 }}
       transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-      className="fixed left-0 top-0 h-screen w-80 flex flex-col z-50 overflow-hidden text-white shadow-2xl select-none"
+      className="fixed left-0 top-0 h-screen w-[260px] flex flex-col z-50 overflow-hidden text-white shadow-2xl select-none"
       style={{
         background: 'linear-gradient(180deg, #120326 0%, #240742 40%, #3d0954 75%, #520b5e 100%)',
       }}
     >
       {/* Decorative Glow Layers */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-16 -left-16 w-64 h-64 bg-pink-600/20 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 -right-20 w-72 h-72 bg-purple-600/20 rounded-full blur-3xl" />
+        <div className="absolute -top-16 -left-16 w-56 h-56 bg-pink-600/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 -right-20 w-64 h-64 bg-purple-600/20 rounded-full blur-3xl" />
       </div>
 
       {/* Header / Brand */}
-      <div className="relative z-10 p-5 flex items-center justify-between border-b border-white/10">
+      <div className="relative z-10 px-3.5 py-3 flex items-center justify-between border-b border-white/10">
         <motion.div
           whileHover={{ scale: 1.02 }}
-          className="flex items-center gap-3 cursor-pointer"
+          className="flex items-center gap-2.5 cursor-pointer"
           onClick={() => navigate('/dashboard')}
         >
           <img
             src="/ideaexecutor_icon_white.png"
             alt="IdeaExecutor Logo"
-            className="w-10 h-10 object-contain rounded-xl shadow-md border border-white/20 bg-white/10 p-1.5 backdrop-blur-sm"
+            className="w-7 h-7 object-contain rounded-lg shadow-md border border-white/20 bg-white/10 p-1 backdrop-blur-sm"
           />
           <div>
-            <h1 className="text-xl font-extrabold tracking-tight text-white font-sans flex items-center gap-1">
+            <h1 className="text-base font-extrabold tracking-tight text-white font-sans flex items-center gap-1 leading-tight">
               IdeaExecutor
             </h1>
-            <p className="text-[10px] text-pink-200/90 font-bold tracking-wider uppercase">
+            <p className="text-[9px] text-pink-200/90 font-bold tracking-wider uppercase leading-none">
               AI Startup Co-Founder
             </p>
           </div>
@@ -202,7 +202,7 @@ export default function Sidebar() {
       </div>
 
       {/* Workflow Navigation */}
-      <nav className="relative z-10 flex-1 px-3 py-4 space-y-1.5 overflow-y-auto scrollbar-thin">
+      <nav className="relative z-10 flex-1 px-2 py-2 space-y-0.5 overflow-y-auto scrollbar-thin">
         {workflowSections.map((section) => {
           const Icon = section.icon;
 
@@ -212,14 +212,14 @@ export default function Sidebar() {
               <button
                 key={section.id}
                 onClick={() => navigate(section.path)}
-                className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   active
-                    ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-md shadow-pink-600/30'
+                    ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-xs'
                     : 'text-slate-300 hover:text-white hover:bg-white/10'
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-pink-300'}`} />
+                <div className="flex items-center gap-2.5">
+                  <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-pink-300'}`} />
                   <span>{section.title}</span>
                 </div>
               </button>
@@ -230,24 +230,24 @@ export default function Sidebar() {
           const hasActiveChild = section.items?.some((item) => location.pathname === item.path);
 
           return (
-            <div key={section.id} className="space-y-1">
+            <div key={section.id} className="space-y-0.5">
               {/* Section Header Accordion Trigger */}
               <button
                 onClick={() => toggleSection(section.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   hasActiveChild
-                    ? 'bg-white/10 text-white border-l-4 border-pink-500'
+                    ? 'bg-white/10 text-white border-l-2 border-pink-500'
                     : 'text-slate-300 hover:text-white hover:bg-white/5'
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 ${hasActiveChild ? 'text-pink-400' : 'text-purple-300'}`} />
+                <div className="flex items-center gap-2.5">
+                  <Icon className={`w-3.5 h-3.5 ${hasActiveChild ? 'text-pink-400' : 'text-purple-300'}`} />
                   <span>{section.title}</span>
                 </div>
                 {isOpen ? (
-                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                 ) : (
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
                 )}
               </button>
 
@@ -258,8 +258,8 @@ export default function Sidebar() {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden pl-7 space-y-1"
+                    transition={{ duration: 0.15 }}
+                    className="overflow-hidden pl-5 space-y-0.5"
                   >
                     {section.items.map((sub) => {
                       const SubIcon = sub.icon;
@@ -268,13 +268,13 @@ export default function Sidebar() {
                         <button
                           key={sub.label + sub.path}
                           onClick={() => navigate(sub.path)}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                          className={`w-full flex items-center gap-2 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer ${
                             active
                               ? 'bg-gradient-to-r from-pink-600/80 to-purple-600/80 text-white font-bold shadow-xs'
                               : 'text-slate-400 hover:text-white hover:bg-white/5'
                           }`}
                         >
-                          <SubIcon className={`w-3.5 h-3.5 ${active ? 'text-white' : 'text-slate-400'}`} />
+                          <SubIcon className={`w-3 h-3 ${active ? 'text-white' : 'text-slate-400'}`} />
                           <span className="truncate">{sub.label}</span>
                         </button>
                       );
@@ -288,43 +288,43 @@ export default function Sidebar() {
       </nav>
 
       {/* Action CTA Button */}
-      <div className="px-4 py-2 relative z-10">
+      <div className="px-2.5 py-1.5 relative z-10">
         <button
           onClick={() => navigate('/input')}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-bold text-xs shadow-lg shadow-pink-600/30 hover:opacity-95 transition cursor-pointer border border-white/20"
+          className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-bold text-xs shadow-md shadow-pink-600/20 hover:opacity-95 transition cursor-pointer border border-white/20"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5" />
           <span>New Idea Analysis</span>
         </button>
       </div>
 
       {/* Footer Profile & Utility Links */}
-      <div className="relative z-10 p-4 bg-slate-950/60 backdrop-blur-sm border-t border-white/10 space-y-2">
-        <div className="flex items-center justify-between">
+      <div className="relative z-10 p-2.5 bg-slate-950/70 backdrop-blur-sm border-t border-white/10 space-y-1.5">
+        <div className="flex items-center justify-between px-1">
           <button
             onClick={() => navigate('/workspace')}
-            className="flex items-center gap-2 text-xs text-slate-300 hover:text-white transition"
+            className="flex items-center gap-1.5 text-[11px] text-slate-300 hover:text-white transition"
           >
-            <Settings className="w-3.5 h-3.5" />
+            <Settings className="w-3 h-3" />
             <span>Settings</span>
           </button>
           <button
             onClick={() => navigate('/notifications')}
-            className="flex items-center gap-2 text-xs text-slate-300 hover:text-white transition"
+            className="flex items-center gap-1.5 text-[11px] text-slate-300 hover:text-white transition"
           >
-            <HelpCircle className="w-3.5 h-3.5" />
+            <HelpCircle className="w-3 h-3" />
             <span>Help</span>
           </button>
         </div>
 
-        <div className="flex items-center justify-between pt-2 border-t border-white/10">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center font-extrabold text-xs text-white">
+        <div className="flex items-center justify-between pt-1.5 border-t border-white/10 px-1">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center font-extrabold text-[11px] text-white">
               S
             </div>
             <div>
-              <div className="text-xs font-bold text-white">Swasthiga</div>
-              <div className="text-[10px] text-slate-400">Founder</div>
+              <div className="text-xs font-bold text-white leading-tight">Swasthiga</div>
+              <div className="text-[9px] text-slate-400 leading-none">Founder</div>
             </div>
           </div>
 
@@ -333,10 +333,10 @@ export default function Sidebar() {
               localStorage.removeItem('token');
               navigate('/login');
             }}
-            className="p-1.5 text-slate-400 hover:text-rose-400 transition"
+            className="p-1 text-slate-400 hover:text-rose-400 transition"
             title="Logout"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>

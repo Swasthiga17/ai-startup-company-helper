@@ -30,34 +30,34 @@ export default function MorningBrief({ briefData }) {
   };
 
   return (
-    <div className="bg-gradient-to-r from-slate-900 via-indigo-950/80 to-slate-900 border border-indigo-500/30 rounded-2xl p-6 shadow-xl backdrop-blur-md">
-      <div className="flex items-center justify-between pb-4 border-b border-indigo-500/20 mb-5">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-amber-500/20 text-amber-400 rounded-xl border border-amber-500/30">
-            <Sun className="w-5 h-5 animate-spin-slow" />
+    <div className="bg-gradient-to-r from-slate-900 via-indigo-950/80 to-slate-900 border border-indigo-500/30 rounded-2xl p-4 sm:p-5 shadow-lg backdrop-blur-md">
+      <div className="flex items-center justify-between pb-2.5 border-b border-indigo-500/20 mb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 bg-amber-500/20 text-amber-400 rounded-lg border border-amber-500/30">
+            <Sun className="w-4 h-4 animate-spin-slow" />
           </div>
           <div>
-            <div className="text-xs font-extrabold text-amber-400 uppercase tracking-widest">AI Co-Founder Morning Brief</div>
-            <h3 className="text-lg font-bold text-white mt-0.5">{brief.greeting}</h3>
+            <div className="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest leading-tight">AI Co-Founder Morning Brief</div>
+            <h3 className="text-base font-bold text-white leading-tight mt-0.5">{brief.greeting}</h3>
           </div>
         </div>
-        <span className="text-xs bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-3 py-1 rounded-full font-medium">
+        <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2.5 py-0.5 rounded-full font-medium">
           Daily Intelligence
         </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
         {/* Priority */}
-        <div className="bg-rose-950/30 border border-rose-500/30 rounded-xl p-4">
-          <div className="text-rose-400 text-xs font-bold uppercase tracking-wider mb-1">
+        <div className="bg-rose-950/30 border border-rose-500/30 rounded-xl p-3">
+          <div className="text-rose-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">
             {brief.priority.label}
           </div>
-          <div className="text-white font-bold text-sm mb-1">{brief.priority.title}</div>
-          <p className="text-slate-300 text-xs leading-relaxed">{brief.priority.description}</p>
+          <div className="text-white font-bold text-xs mb-0.5">{brief.priority.title}</div>
+          <p className="text-slate-300 text-[11px] leading-relaxed">{brief.priority.description}</p>
         </div>
 
         {/* Risk */}
-        <div className="bg-amber-950/30 border border-amber-500/30 rounded-xl p-4">
+        <div className="bg-amber-950/30 border border-amber-500/30 rounded-xl p-3">
           <div className="text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
             {brief.risk.label}
           </div>
