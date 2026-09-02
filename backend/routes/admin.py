@@ -11,6 +11,13 @@ router = APIRouter(tags=["admin"])
 
 @router.get("/admin/stats")
 async def get_admin_stats(current_user=Depends(get_current_user)):
+    # Restrict to administrator (User ID 1 or is_admin flag)
+    if current_user.id != 1 and not getattr(current_user, "is_admin", False):
+        raise HTTPException(
+            status_code=403,
+            detail="Administrative privileges required to access system statistics."
+        )
+
     try:
         db: Session = SessionLocal()
         try:

@@ -6,7 +6,7 @@ import re
 import math
 import hashlib
 
-def get_idea_domain(idea: str) -> dict:
+def _resolve_domain_template(idea: str) -> dict:
     text = idea.lower()
 
     # Keyword categorization
@@ -163,3 +163,16 @@ def get_idea_domain(idea: str) -> dict:
         ],
         "rev_base": 0.5, "rev_mult": 3.6
     }
+
+
+def get_idea_domain(idea: str) -> dict:
+    """
+    Returns domain analysis template clearly annotated as a heuristic benchmark
+    to avoid presenting fallback values as empirical research.
+    """
+    data = _resolve_domain_template(idea)
+    data["is_simulated_benchmark"] = True
+    data["verification_status"] = "HEURISTIC_ESTIMATE"
+    data["benchmark_notice"] = "Heuristic domain benchmark. Pending empirical verification."
+    return data
+

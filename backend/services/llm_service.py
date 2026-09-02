@@ -40,21 +40,11 @@ class LLMService:
         try:
             from google import genai
             client = genai.Client(api_key=self.api_key)
-            model_candidates = [self.model_name] + [m for m in self.fallback_models if m != self.model_name]
-            model_candidates = list(dict.fromkeys(model_candidates))
-            for candidate in model_candidates:
-                try:
-                    res = client.models.generate_content(model=candidate, contents="Ping")
-                    if res and res.text:
-                        self.client = client
-                        self.model_name = candidate
-                        self.available = True
-                        self.sdk_type = "modern"
-                        logger.info(f"LLMService successfully initialized with google-genai SDK (model: {candidate})")
-                        return
-                except Exception as candidate_err:
-                    logger.debug(f"google-genai model candidate '{candidate}' failed init: {candidate_err}")
-                    continue
+            self.client = client
+            self.available = True
+            self.sdk_type = "modern"
+            logger.info(f"LLMService successfully initialized with google-genai SDK (model: {self.model_name})")
+            return
         except Exception as e:
             logger.error(f"Failed to initialize google-genai SDK: {e}")
 

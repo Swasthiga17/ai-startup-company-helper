@@ -40,20 +40,9 @@ try:
         try:
             from google import genai
             client = genai.Client(api_key=GEMINI_API_KEY)
-            model_candidates = [configured_model, "gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash"]
-            model_candidates = list(dict.fromkeys(model_candidates))
-            
-            for candidate in model_candidates:
-                try:
-                    res = client.models.generate_content(model=candidate, contents="Ping")
-                    if res and res.text:
-                        model = GeminiClientWrapper(client, candidate)
-                        GEMINI_AVAILABLE = True
-                        logger.info(f"Gemini AI client successfully initialized with google-genai SDK (model: {candidate})")
-                        break
-                except Exception as candidate_err:
-                    logger.debug(f"google-genai candidate '{candidate}' failed verification: {candidate_err}")
-                    continue
+            model = GeminiClientWrapper(client, configured_model)
+            GEMINI_AVAILABLE = True
+            logger.info(f"Gemini AI client successfully initialized with google-genai SDK (model: {configured_model})")
         except Exception as new_sdk_err:
             logger.debug(f"google-genai SDK init bypassed: {new_sdk_err}")
 

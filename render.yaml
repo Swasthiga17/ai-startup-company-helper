@@ -14,7 +14,11 @@ services:
         value: production
       - key: GEMINI_API_KEY
         sync: false
+      - key: SECRET_KEY
+        generateValue: true
       - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: BILLING_WEBHOOK_SECRET
         generateValue: true
       - key: CHROMA_PATH
         value: /app/chroma_db

@@ -116,18 +116,26 @@ def market_node(state: StartupState) -> Dict[str, Any]:
 
         if res.get("success", True) is not False:
             logger.info(f"[LangGraph] [Agent:Market] Completed in {dt}s")
+            tam_val = res.get("tam")
+            sam_val = res.get("sam")
+            som_val = res.get("som")
             return {
                 "market_analysis": res,
                 "market": {
-                    "target_market": {"demographics": ["Urban professionals", "Target users"], "psychographics": ["Tech-savvy"]},
-                    "market_size": {"tam": res.get("tam", "$50B"), "sam": res.get("sam", "$15B"), "som": res.get("som", "$2B")},
-                    "growth_potential": "High market opportunity",
+                    "target_market": {"demographics": ["Target users and early adopters"], "psychographics": ["Tech-forward"]},
+                    "market_size": {
+                        "tam": tam_val if tam_val else "Pending Live AI Verification",
+                        "sam": sam_val if sam_val else "Pending Live AI Verification",
+                        "som": som_val if som_val else "Pending Live AI Verification",
+                        "verification_status": "VERIFIED_RESEARCH" if tam_val else "UNVERIFIED_PENDING_INPUT"
+                    },
+                    "growth_potential": res.get("growth") or "Market Opportunity Analysis Pending",
                     "risks": res.get("risks", [])
                 },
                 "competitors": {"competitors": res.get("competitors", [])},
                 "swot": {
-                    "strengths": ["Innovative solution", "Lean setup"],
-                    "weaknesses": ["Early traction"],
+                    "strengths": ["Innovative solution", "Lean startup architecture"],
+                    "weaknesses": ["Early traction and brand awareness"],
                     "opportunities": res.get("trends", []),
                     "threats": res.get("risks", [])
                 }
@@ -169,11 +177,12 @@ def business_node(state: StartupState) -> Dict[str, Any]:
                     "key_metrics": ["MRR", "CAC", "LTV", "Churn Rate"]
                 },
                 "revenue": {
-                    "projections": [
-                        {"year": "Year 1", "revenue": 0.5, "users": 1000, "growth": 0},
-                        {"year": "Year 2", "revenue": 2.5, "users": 10000, "growth": 400},
-                        {"year": "Year 3", "revenue": 8.0, "users": 50000, "growth": 220}
+                    "projections": res.get("projections") or res.get("revenue_projections") or [
+                        {"year": "Year 1", "revenue": 0.0, "users": 0, "growth": 0, "status": "Pending pricing inputs"},
+                        {"year": "Year 2", "revenue": 0.0, "users": 0, "growth": 0, "status": "Pending pricing inputs"},
+                        {"year": "Year 3", "revenue": 0.0, "users": 0, "growth": 0, "status": "Pending pricing inputs"}
                     ],
+                    "projection_status": "CALCULATED" if (res.get("projections") or res.get("revenue_projections")) else "PENDING_INPUTS",
                     "revenue_streams": res.get("revenue_streams", [])
                 }
             }

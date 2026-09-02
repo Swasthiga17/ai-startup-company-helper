@@ -57,6 +57,16 @@
 [x] Multi-tenant isolation verified across API endpoints
 [x] Production smoke test suite passing
 [x] Synthetic founder validation suite passing (30/30)
+[x] Security & Hardening fixes verified:
+    * SECRET_KEY / JWT_SECRET_KEY dual-resolution aligned
+    * Admin authorization guard (403) active on /admin/stats
+    * Billing webhook protected with X-Billing-Webhook-Secret
+    * Missing langchain-text-splitters added to backend/requirements.txt
+    * Fabricated market/financial fallback numbers removed & labeled
+    * Gemini startup Ping eliminated to conserve quota
+    * Full Vite proxying configured for all 20+ backend endpoints
+    * Real PasswordResetToken generation and verification implemented
+    * Runtime adversarial test cases aligned with 5 canonical scenarios
 [ ] Deploy to production hosting environment (e.g. Render / Vercel / Netlify)
 [ ] Live production smoke testing
 [ ] Onboard 5-10 Private Beta founders for PMF validation (Phase 23)

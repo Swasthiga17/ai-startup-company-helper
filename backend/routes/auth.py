@@ -9,9 +9,11 @@ from sqlalchemy.orm import Session
 import bcrypt
 from jose import jwt, JWTError
 
+import os
+import secrets
 from database import SessionLocal
 from config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
-from models.auth_models import User
+from models.auth_models import User, PasswordResetToken
 from utils.logger import logger
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -128,10 +130,68 @@ class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 
 
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+
 @router.post("/forgot-password")
-async def forgot_password(req: ForgotPasswordRequest):
-    # Simulated password reset
-    return {"message": "If this email is registered, you will receive a reset link shortly."}
+async def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == req.email.lower()).first()
+    reset_token_str = None
+    if user:
+        # Invalidate any previous unexpired tokens
+        db.query(PasswordResetToken).filter(
+            PasswordResetToken.user_id == user.id,
+            PasswordResetToken.used == False
+        ).update({"used": True})
+
+        token_value = secrets.token_urlsafe(32)
+        reset_token = PasswordResetToken(
+            user_id=user.id,
+            token=token_value,
+            used=False,
+            expires_at=datetime.utcnow() + timedelta(hours=1)
+        )
+        db.add(reset_token)
+        db.commit()
+        reset_token_str = token_value
+        logger.info(f"Generated password reset token for user {user.id}")
+
+    resp = {"message": "If this email is registered, you will receive a reset link shortly."}
+    # Expose token in dev/test environment for automated verification
+    if reset_token_str and os.getenv("ENVIRONMENT", "").lower() != "production":
+        resp["reset_token"] = reset_token_str
+    return resp
+
+
+@router.post("/reset-password")
+async def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
+    if len(req.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters long.")
+
+    token_record = db.query(PasswordResetToken).filter(
+        PasswordResetToken.token == req.token,
+        PasswordResetToken.used == False
+    ).first()
+
+    if not token_record:
+        raise HTTPException(status_code=400, detail="Invalid or already used password reset token.")
+
+    if token_record.expires_at < datetime.utcnow():
+        token_record.used = True
+        db.commit()
+        raise HTTPException(status_code=400, detail="Password reset token has expired.")
+
+    user = db.query(User).filter(User.id == token_record.user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User account not found.")
+
+    user.hashed_password = hash_password(req.new_password)
+    token_record.used = True
+    db.commit()
+    return {"status": "success", "message": "Password successfully updated. You may now log in with your new password."}
+
 
 
 class GoogleAuthRequest(BaseModel):

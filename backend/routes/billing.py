@@ -57,8 +57,19 @@ async def create_checkout(req: CheckoutRequest, current_user=Depends(get_current
         "checkout_url": f"https://billing.ideaexecutor.ai/checkout?user={current_user.id}&plan={req.plan_id.upper()}"
     }
 
+import os
+from config import BILLING_WEBHOOK_SECRET
+
 @router.post("/webhooks")
-async def handle_webhook(event: WebhookEventRequest):
+async def handle_webhook(event: WebhookEventRequest, request: Request):
+    is_prod = os.getenv("ENVIRONMENT", "").lower() == "production"
+    incoming_secret = request.headers.get("X-Billing-Webhook-Secret") or request.query_params.get("secret")
+
+    if is_prod or (incoming_secret is not None and incoming_secret != ""):
+        if not incoming_secret or incoming_secret != BILLING_WEBHOOK_SECRET:
+            logger.warning(f"Unauthorized billing webhook rejection for user_id={event.user_id}")
+            raise HTTPException(status_code=401, detail="Invalid or missing billing webhook secret.")
+
     logger.info(f"Processing billing webhook: {event.event_type} for user_id={event.user_id}")
 
     db: Session = SessionLocal()
