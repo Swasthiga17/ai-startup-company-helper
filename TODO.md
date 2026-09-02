@@ -67,6 +67,7 @@
     * Full Vite proxying configured for all 20+ backend endpoints
     * Real PasswordResetToken generation and verification implemented
     * Runtime adversarial test cases aligned with 5 canonical scenarios
+[x] Compact & Professional Dashboard UI Redesign (~20-25% more compact, 4 KPIs per row, h-16 header, w-260px sidebar)
 [ ] Deploy to production hosting environment (e.g. Render / Vercel / Netlify)
 [ ] Live production smoke testing
 [ ] Onboard 5-10 Private Beta founders for PMF validation (Phase 23)
