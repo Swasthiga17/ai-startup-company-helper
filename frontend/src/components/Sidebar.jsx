@@ -299,34 +299,40 @@ export default function Sidebar() {
       <div className="relative z-10 p-2.5 bg-slate-950/70 backdrop-blur-sm border-t border-white/10 space-y-1.5">
         <div className="flex items-center justify-between px-1">
           <button
-            onClick={() => navigate('/workspace')}
-            className="flex items-center gap-1.5 text-[11px] text-slate-300 hover:text-white transition"
+            onClick={() => navigate('/settings')}
+            className={`flex items-center gap-1.5 text-[11px] transition cursor-pointer ${
+              location.pathname === '/settings' ? 'text-purple-400 font-bold' : 'text-slate-300 hover:text-white'
+            }`}
           >
-            <Settings className="w-3 h-3" />
+            <Settings size={18} />
             <span>Settings</span>
           </button>
           <button
             onClick={() => navigate('/notifications')}
-            className="flex items-center gap-1.5 text-[11px] text-slate-300 hover:text-white transition"
+            className="flex items-center gap-1.5 text-[11px] text-slate-300 hover:text-white transition cursor-pointer"
           >
-            <HelpCircle className="w-3 h-3" />
+            <HelpCircle className="w-3.5 h-3.5" />
             <span>Help</span>
           </button>
         </div>
 
-        <div className="flex items-center justify-between pt-1.5 border-t border-white/10 px-1">
+        <div
+          className="flex items-center justify-between pt-1.5 border-t border-white/10 px-1 cursor-pointer group"
+          onClick={() => navigate('/settings')}
+        >
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center font-extrabold text-[11px] text-white">
+            <div className="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center font-extrabold text-[11px] text-white shadow-xs">
               S
             </div>
             <div>
-              <div className="text-xs font-bold text-white leading-tight">Swasthiga</div>
+              <div className="text-xs font-bold text-white leading-tight group-hover:text-purple-300 transition">Swasthiga B S</div>
               <div className="text-[9px] text-slate-400 leading-none">Founder</div>
             </div>
           </div>
 
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               localStorage.removeItem('token');
               navigate('/login');
             }}

@@ -48,8 +48,10 @@ import Decisions from '../pages/Decisions';
 import Experiments from '../pages/Experiments';
 import ProductMarketFitDashboard from '../pages/ProductMarketFitDashboard';
 import BusinessIntelligenceDashboard from '../pages/BusinessIntelligenceDashboard';
+import Settings from '../pages/Settings';
 
 const titles = {
+  '/settings': 'Settings',
   '/dashboard': 'Executive Summary',
   '/pmf': 'Product-Market Fit Dashboard',
   '/business-intelligence': 'Business Intelligence Dashboard',
@@ -146,6 +148,7 @@ export default function AppRoutes() {
         <Route path="/notifications" element={<ProtectedRoute><Layout title="Notifications"><Notifications /></Layout></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><Layout title="Admin Panel"><AdminPanel /></Layout></ProtectedRoute>} />
         <Route path="/launch-readiness" element={<ProtectedRoute><Layout title={titles['/launch-readiness']}><LaunchReadiness /></Layout></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><Layout title={titles['/settings']}><Settings /></Layout></ProtectedRoute>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
