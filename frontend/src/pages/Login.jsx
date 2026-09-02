@@ -20,10 +20,15 @@ export default function Login() {
           const histResp = await fetch(`${import.meta.env.VITE_API_URL || ''}/history`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
-            if (histResp.ok) {
+          if (histResp.ok) {
+            const histData = await histResp.json();
+            if (histData.data && histData.data.length > 0) {
               navigate('/dashboard');
               return;
-            } else {
+            }
+            navigate('/onboarding');
+            return;
+          } else {
             // Token expired or invalid - clear it so user can log in with their credentials
             localStorage.removeItem('token');
           }

@@ -213,8 +213,8 @@ export default function Sidebar() {
                 key={section.id}
                 onClick={() => navigate(section.path)}
                 className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${active
-                    ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-xs'
-                    : 'text-slate-300 hover:text-white hover:bg-white/10'
+                  ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-xs'
+                  : 'text-slate-300 hover:text-white hover:bg-white/10'
                   }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -234,8 +234,8 @@ export default function Sidebar() {
               <button
                 onClick={() => toggleSection(section.id)}
                 className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${hasActiveChild
-                    ? 'bg-white/10 text-white border-l-2 border-pink-500'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  ? 'bg-white/10 text-white border-l-2 border-pink-500'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
                   }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -267,8 +267,8 @@ export default function Sidebar() {
                           key={sub.label + sub.path}
                           onClick={() => navigate(sub.path)}
                           className={`w-full flex items-center gap-2 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer ${active
-                              ? 'bg-gradient-to-r from-pink-600/80 to-purple-600/80 text-white font-bold shadow-xs'
-                              : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            ? 'bg-gradient-to-r from-pink-600/80 to-purple-600/80 text-white font-bold shadow-xs'
+                            : 'text-slate-400 hover:text-white hover:bg-white/5'
                             }`}
                         >
                           <SubIcon className={`w-3 h-3 ${active ? 'text-white' : 'text-slate-400'}`} />
