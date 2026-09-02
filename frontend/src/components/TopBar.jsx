@@ -96,10 +96,21 @@ export default function TopBar({ title }) {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => alert('Settings panel coming soon')}
+          onClick={() => navigate('/settings')}
           className="w-9 h-9 rounded-lg flex items-center justify-center text-pink-100 bg-white/10 hover:bg-white/20 border border-white/20 transition cursor-pointer backdrop-blur-md"
+          title="Settings"
         >
           <Settings className="w-4 h-4" />
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate('/settings')}
+          className="w-8 h-8 rounded-full bg-purple-600 text-white font-bold text-xs flex items-center justify-center ring-2 ring-white/30 shadow-sm cursor-pointer ml-0.5"
+          title="Profile & Settings"
+        >
+          S
         </motion.button>
       </div>
     </motion.header>
