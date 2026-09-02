@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   User,
   Bell,
@@ -9,16 +10,24 @@ import {
   Rocket,
   Calendar,
   CheckCircle2,
-  ExternalLink
+  ExternalLink,
+  LogOut
 } from 'lucide-react';
 import api from '../services/api';
 
 const Settings = () => {
+  const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState({
     name: 'Swasthiga B S',
     email: 'swasthiga@example.com'
   });
   const [saveToast, setSaveToast] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('has_seen_onboarding');
+    navigate('/login');
+  };
 
   // Default fallback startups
   const [createdStartups, setCreatedStartups] = useState([
@@ -113,7 +122,7 @@ const Settings = () => {
       <div className="max-w-6xl mx-auto">
 
         {/* Header */}
-        <div className="bg-white rounded-3xl p-7 mb-6 shadow-sm">
+        <div className="bg-white rounded-3xl p-7 mb-6 shadow-sm flex items-center justify-between">
 
           <div className="flex items-center gap-4">
 
@@ -132,6 +141,15 @@ const Settings = () => {
             </div>
 
           </div>
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold text-sm transition cursor-pointer shadow-xs shrink-0"
+            title="Log Out"
+          >
+            <LogOut size={18} />
+            <span>Log Out</span>
+          </button>
 
         </div>
 
@@ -510,9 +528,19 @@ const Settings = () => {
           </div>
 
 
-          <button className="px-5 py-3 border border-slate-200 rounded-xl font-semibold hover:bg-slate-50">
-            Change Password
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <button className="px-5 py-3 border border-slate-200 rounded-xl font-semibold hover:bg-slate-50 cursor-pointer">
+              Change Password
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="px-5 py-3 border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-xl flex items-center gap-2 transition cursor-pointer"
+            >
+              <LogOut size={18} />
+              <span>Log Out of Account</span>
+            </button>
+          </div>
 
         </section>
 
