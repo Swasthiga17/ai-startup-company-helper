@@ -2,76 +2,113 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
-  User, Settings as SettingsIcon, Users, Shield, CreditCard, Bell,
-  Layers, Edit3, Check, Camera, Globe, Clock, HelpCircle,
-  Building, HardDrive, FileText, Upload, TrendingUp, ChevronDown,
-  CheckCircle2
+  User, Sparkles, Bell, Shield, Palette, AlertTriangle,
+  Check, Lock, LogOut, Key, Camera, Sliders, Cpu,
+  CheckCircle2, Trash2, Eye, EyeOff, Laptop, Moon, Sun,
+  Layers, ChevronRight, HelpCircle
 } from 'lucide-react';
 import api from '../services/api';
 
 export default function Settings() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('Profile');
-  const [isEditing, setIsEditing] = useState(false);
+  const [activeSection, setActiveSection] = useState('profile');
   const [saveToast, setSaveToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('Settings saved successfully!');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // Profile Form State (Defaults match screenshot)
-  const [profile, setProfile] = useState({
-    fullName: 'Swasthiga B S',
-    email: 'swasthiga@example.com',
-    role: 'Founder',
-    company: 'Startup Pilot Idea',
-    bio: 'AI enthusiast and builder. Passionate about solving real world problems using technology.',
-    avatarLetter: 'S'
+  // Profile State
+  const [fullName, setFullName] = useState('Swasthiga B S');
+  const [email, setEmail] = useState('swasthiga@example.com');
+  const [bio, setBio] = useState('AI enthusiast and builder. Passionate about solving real world problems using technology.');
+
+  // AI Preferences State
+  const [responseStyle, setResponseStyle] = useState('Detailed');
+  const [creativityLevel, setCreativityLevel] = useState(70);
+  const [autoGenerateInsights, setAutoGenerateInsights] = useState(true);
+  const [showConfidenceScores, setShowConfidenceScores] = useState(true);
+  const [aiModel, setAiModel] = useState('gemini-2.5-flash');
+
+  // Notification Toggles
+  const [notifications, setNotifications] = useState({
+    taskCompleted: true,
+    weeklySummary: true,
+    productUpdates: false,
+    emailNotifications: true,
   });
 
-  // Preferences State (Matches screenshot)
-  const [preferences, setPreferences] = useState({
-    language: 'English',
-    timezone: '(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi',
-    currency: 'INR (₹) Indian Rupee',
-    workspace: 'Startup Pilot Idea'
-  });
+  // Security State
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPass, setShowPass] = useState(false);
 
-  // Load real user details if logged in
+  // Appearance State
+  const [theme, setTheme] = useState('light');
+  const [compactLayout, setCompactLayout] = useState(true);
+  const [sidebarBehavior, setSidebarBehavior] = useState('expanded');
+
+  // Load user data from backend if logged in
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const resp = await api.get('/auth/me');
         if (resp.data) {
-          setProfile(prev => ({
-            ...prev,
-            fullName: resp.data.name || prev.fullName,
-            email: resp.data.email || prev.email,
-            avatarLetter: (resp.data.name || 'S').charAt(0).toUpperCase()
-          }));
+          if (resp.data.name) setFullName(resp.data.name);
+          if (resp.data.email) setEmail(resp.data.email);
         }
       } catch {
-        // Fallback to initial values from screenshot
+        // Retain default demo state
       }
     };
     fetchUser();
   }, []);
 
-  const handleSaveProfile = (e) => {
-    if (e) e.preventDefault();
-    setIsEditing(false);
+  const triggerToast = (msg) => {
+    setToastMessage(msg);
     setSaveToast(true);
     setTimeout(() => setSaveToast(false), 3000);
   };
 
-  const tabs = [
-    { id: 'Profile', label: 'Profile', icon: User },
-    { id: 'Preferences', label: 'Preferences', icon: SettingsIcon },
-    { id: 'Workspace', label: 'Workspace', icon: Users },
-    { id: 'Security', label: 'Security', icon: Shield },
-    { id: 'Billing', label: 'Billing', icon: CreditCard },
-    { id: 'Notifications', label: 'Notifications', icon: Bell },
-    { id: 'Integrations', label: 'Integrations', icon: Layers },
+  const handleSaveProfile = (e) => {
+    if (e) e.preventDefault();
+    triggerToast('Profile updated successfully!');
+  };
+
+  const handleChangePassword = (e) => {
+    e.preventDefault();
+    if (!newPassword || newPassword.length < 6) {
+      alert('Password must be at least 6 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      alert('Passwords do not match.');
+      return;
+    }
+    setShowPasswordModal(false);
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    triggerToast('Password changed successfully!');
+  };
+
+  const handleDeleteAccount = () => {
+    setShowDeleteModal(false);
+    localStorage.clear();
+    navigate('/login');
+  };
+
+  const sections = [
+    { id: 'profile', label: 'Profile', icon: User },
+    { id: 'ai-preferences', label: 'AI Preferences', icon: Sparkles },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'security', label: 'Security', icon: Shield },
+    { id: 'appearance', label: 'Appearance', icon: Palette },
+    { id: 'danger', label: 'Danger Zone', icon: AlertTriangle, isDanger: true },
   ];
 
   return (
-    <div className="space-y-6 text-left max-w-[1400px] mx-auto pb-12">
+    <div className="min-h-screen text-slate-800 font-sans pb-16">
       {/* Toast Notification */}
       <AnimatePresence>
         {saveToast && (
@@ -82,531 +119,526 @@ export default function Settings() {
             className="fixed top-20 right-8 z-50 bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2 text-xs font-bold"
           >
             <CheckCircle2 className="w-4 h-4" />
-            <span>Settings saved successfully!</span>
+            <span>{toastMessage}</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ── Sub-Navigation Tabs ── */}
-      <div className="border-b border-slate-200/80 -mt-2">
-        <nav className="flex space-x-1 sm:space-x-3 overflow-x-auto scrollbar-none py-1">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all relative whitespace-nowrap cursor-pointer ${
-                  isActive
-                    ? 'text-purple-600 font-bold'
-                    : 'text-slate-500 hover:text-slate-800 hover:bg-white/40 rounded-lg'
-                }`}
-              >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-purple-600' : 'text-slate-400'}`} />
-                <span>{tab.label}</span>
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 rounded-full"
-                  />
-                )}
-              </button>
-            );
-          })}
-        </nav>
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-black text-slate-900 tracking-tight text-left">Settings</h1>
+        <p className="text-xs text-slate-500 font-medium mt-1 text-left">
+          Manage your account, AI preferences, notifications & security
+        </p>
       </div>
 
-      {/* ── Main Content Grid ── */}
-      {activeTab === 'Profile' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Column (8 cols): Profile Info & Preferences */}
-          <div className="lg:col-span-8 space-y-6">
-            {/* Profile Information Card */}
-            <div className="bg-white rounded-2xl p-5 sm:p-7 border border-slate-100 shadow-sm relative overflow-hidden">
-              <div className="flex items-start justify-between mb-6 pb-2">
+      {/* Main Settings Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 text-left">
+        {/* Sticky Settings Sidebar Navigation */}
+        <div className="md:col-span-3">
+          <div className="bg-white rounded-2xl p-2.5 border border-slate-200/80 shadow-xs sticky top-20 space-y-1">
+            {sections.map((sec) => {
+              const Icon = sec.icon;
+              const isActive = activeSection === sec.id;
+              return (
+                <button
+                  key={sec.id}
+                  onClick={() => {
+                    setActiveSection(sec.id);
+                    document.getElementById(sec.id)?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    sec.isDanger
+                      ? isActive
+                        ? 'bg-rose-50 text-rose-600 border border-rose-200'
+                        : 'text-rose-500 hover:bg-rose-50/50'
+                      : isActive
+                      ? 'bg-blue-50 text-blue-600 border border-blue-100 shadow-xs'
+                      : 'text-slate-600 hover:bg-slate-100/60'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Icon className={`w-4 h-4 ${sec.isDanger ? 'text-rose-500' : isActive ? 'text-blue-600' : 'text-slate-400'}`} />
+                    <span>{sec.label}</span>
+                  </div>
+                  <ChevronRight className={`w-3.5 h-3.5 ${isActive ? 'opacity-100' : 'opacity-0'}`} />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Right Settings Cards Container */}
+        <div className="md:col-span-9 space-y-6">
+          {/* ── 1. Profile ── */}
+          <div id="profile" className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4 text-blue-600" />
+                <h2 className="text-base font-bold text-slate-800">Profile</h2>
+              </div>
+            </div>
+
+            <form onSubmit={handleSaveProfile} className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-full bg-blue-600 text-white font-extrabold text-2xl flex items-center justify-center shadow-md">
+                    {fullName.charAt(0).toUpperCase()}
+                  </div>
+                  <label className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full border border-slate-200 shadow-xs flex items-center justify-center text-blue-600 hover:bg-slate-50 cursor-pointer">
+                    <Camera className="w-3 h-3" />
+                    <input type="file" className="hidden" accept="image/*" onChange={() => triggerToast('Profile picture updated!')} />
+                  </label>
+                </div>
                 <div>
-                  <h2 className="text-base sm:text-lg font-extrabold text-slate-800 tracking-tight">
-                    Profile Information
-                  </h2>
-                  <p className="text-xs text-slate-450 font-medium mt-0.5">
-                    Update your personal information and profile details.
-                  </p>
+                  <div className="text-xs font-bold text-slate-800">{fullName}</div>
+                  <div className="text-[11px] text-slate-400">{email}</div>
+                  <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 text-[10px] font-extrabold uppercase">Founder</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Full Name</label>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Bio</label>
+                <textarea
+                  rows={2}
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
+                />
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* ── 2. AI Preferences ── */}
+          <div id="ai-preferences" className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-600" />
+                <h2 className="text-base font-bold text-slate-800">AI Preferences</h2>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {/* Response Style */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div>
+                  <div className="text-xs font-bold text-slate-800">AI Response Style</div>
+                  <div className="text-[11px] text-slate-400">Choose how detailed your AI co-founder answers should be</div>
+                </div>
+                <div className="flex gap-1.5 bg-slate-100 p-1 rounded-xl">
+                  {['Concise', 'Balanced', 'Detailed'].map((style) => (
+                    <button
+                      key={style}
+                      type="button"
+                      onClick={() => { setResponseStyle(style); triggerToast(`AI style set to ${style}`); }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                        responseStyle === style ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      {style}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* AI Creativity Slider */}
+              <div className="pb-3 border-b border-slate-100">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <div className="text-xs font-bold text-slate-800">AI Creativity</div>
+                    <div className="text-[11px] text-slate-400">Balance between strict analytical facts vs innovative brainstorming</div>
+                  </div>
+                  <span className="text-xs font-extrabold text-blue-600">{creativityLevel}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={creativityLevel}
+                  onChange={(e) => setCreativityLevel(Number(e.target.value))}
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+              </div>
+
+              {/* Auto-generate Insights */}
+              <div className="flex items-center justify-between py-1 border-b border-slate-100">
+                <div>
+                  <div className="text-xs font-bold text-slate-800">Auto-generate Insights</div>
+                  <div className="text-[11px] text-slate-400">Automatically run background RAG & market sentiment updates</div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => {
-                    if (isEditing) {
-                      handleSaveProfile();
-                    } else {
-                      setIsEditing(true);
-                    }
-                  }}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-purple-200 text-purple-600 text-xs font-bold hover:bg-purple-50 transition cursor-pointer shadow-xs"
+                  onClick={() => { setAutoGenerateInsights(!autoGenerateInsights); triggerToast('AI preference updated'); }}
+                  className={`w-11 h-6 flex items-center rounded-full p-1 transition cursor-pointer ${
+                    autoGenerateInsights ? 'bg-blue-600 justify-end' : 'bg-slate-200 justify-start'
+                  }`}
                 >
-                  {isEditing ? (
-                    <>
-                      <Check className="w-3.5 h-3.5" />
-                      <span>Save Changes</span>
-                    </>
-                  ) : (
-                    <>
-                      <Edit3 className="w-3.5 h-3.5" />
-                      <span>Edit Profile</span>
-                    </>
-                  )}
+                  <motion.div layout className="w-4 h-4 bg-white rounded-full shadow-md" />
                 </button>
               </div>
 
-              {/* Avatar + Inputs Form */}
-              <form onSubmit={handleSaveProfile}>
-                <div className="flex flex-col sm:flex-row items-start gap-6 mb-5">
-                  {/* Big Circular Avatar with Camera badge */}
-                  <div className="relative shrink-0">
-                    <div className="w-20 h-20 rounded-full bg-[#6D28D9] text-white flex items-center justify-center font-black text-3xl shadow-md select-none">
-                      {profile.avatarLetter}
-                    </div>
-                    <label className="absolute -bottom-1 -right-1 w-7 h-7 bg-white rounded-full border border-slate-200 shadow-sm flex items-center justify-center text-purple-600 hover:bg-slate-50 cursor-pointer transition">
-                      <Camera className="w-3.5 h-3.5" />
-                      <input type="file" className="hidden" accept="image/*" onChange={() => alert('Profile photo updated')} />
-                    </label>
-                  </div>
-
-                  {/* 2-Column Fields */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 w-full">
-                    <div>
-                      <label className="text-[11px] font-bold text-slate-700 block mb-1.5">
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        disabled={!isEditing}
-                        value={profile.fullName}
-                        onChange={(e) => setProfile({ ...profile, fullName: e.target.value })}
-                        className="w-full bg-slate-50/70 border border-slate-200/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition disabled:bg-slate-50/50 disabled:text-slate-700"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[11px] font-bold text-slate-700 block mb-1.5">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        disabled={!isEditing}
-                        value={profile.email}
-                        onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                        className="w-full bg-slate-50/70 border border-slate-200/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition disabled:bg-slate-50/50 disabled:text-slate-700"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[11px] font-bold text-slate-700 block mb-1.5">
-                        Role
-                      </label>
-                      <input
-                        type="text"
-                        disabled={!isEditing}
-                        value={profile.role}
-                        onChange={(e) => setProfile({ ...profile, role: e.target.value })}
-                        className="w-full bg-slate-50/70 border border-slate-200/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition disabled:bg-slate-50/50 disabled:text-slate-700"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[11px] font-bold text-slate-700 block mb-1.5">
-                        Company / Organization
-                      </label>
-                      <input
-                        type="text"
-                        disabled={!isEditing}
-                        value={profile.company}
-                        onChange={(e) => setProfile({ ...profile, company: e.target.value })}
-                        className="w-full bg-slate-50/70 border border-slate-200/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition disabled:bg-slate-50/50 disabled:text-slate-700"
-                      />
-                    </div>
-                  </div>
+              {/* Show Confidence Scores */}
+              <div className="flex items-center justify-between py-1 border-b border-slate-100">
+                <div>
+                  <div className="text-xs font-bold text-slate-800">Show Confidence Scores</div>
+                  <div className="text-[11px] text-slate-400">Display agent verification tags (e.g., 94% verified)</div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => { setShowConfidenceScores(!showConfidenceScores); triggerToast('AI preference updated'); }}
+                  className={`w-11 h-6 flex items-center rounded-full p-1 transition cursor-pointer ${
+                    showConfidenceScores ? 'bg-blue-600 justify-end' : 'bg-slate-200 justify-start'
+                  }`}
+                >
+                  <motion.div layout className="w-4 h-4 bg-white rounded-full shadow-md" />
+                </button>
+              </div>
 
-                {/* Bio (Full Width) */}
-                <div className="pt-1">
-                  <label className="text-[11px] font-bold text-slate-700 block mb-1.5">
-                    Bio
-                  </label>
-                  <textarea
-                    rows={3}
-                    disabled={!isEditing}
-                    value={profile.bio}
-                    onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                    className="w-full bg-slate-50/70 border border-slate-200/80 rounded-xl p-3 text-xs text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition disabled:bg-slate-50/50 disabled:text-slate-700 leading-relaxed resize-none"
-                  />
+              {/* AI Model Preference */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                <div>
+                  <div className="text-xs font-bold text-slate-800">AI Model Preference</div>
+                  <div className="text-[11px] text-slate-400">Select default model engine for execution graphs</div>
                 </div>
-              </form>
+                <select
+                  value={aiModel}
+                  onChange={(e) => { setAiModel(e.target.value); triggerToast(`Model changed to ${e.target.value}`); }}
+                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
+                >
+                  <option value="gemini-2.5-flash">Gemini 2.5 Flash (Fast & Accurate)</option>
+                  <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep Context)</option>
+                  <option value="claude-3.5-sonnet">Claude 3.5 Sonnet (Strategic)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 3. Notifications ── */}
+          <div id="notifications" className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-amber-500" />
+                <h2 className="text-base font-bold text-slate-800">Notifications</h2>
+              </div>
             </div>
 
-            {/* Preferences Card */}
-            <div className="bg-white rounded-2xl p-5 sm:p-7 border border-slate-100 shadow-sm">
-              <div className="mb-5 pb-2">
-                <h2 className="text-base sm:text-lg font-extrabold text-slate-800 tracking-tight">
-                  Preferences
-                </h2>
-                <p className="text-xs text-slate-450 font-medium mt-0.5">
-                  Manage your account preferences.
+            <div className="space-y-3">
+              {[
+                { key: 'taskCompleted', title: 'AI Task Completed', desc: 'Notify when market research or pitch decks finish generating' },
+                { key: 'weeklySummary', title: 'Weekly Startup Summary', desc: 'Receive a weekly health score and milestone digest' },
+                { key: 'productUpdates', title: 'Product Updates', desc: 'Get updates on new IdeaExecutor agent features' },
+                { key: 'emailNotifications', title: 'Email Notifications', desc: 'Deliver important updates directly to your registered email' },
+              ].map((item) => (
+                <div key={item.key} className="flex items-center justify-between py-2 border-b border-slate-100/60">
+                  <div>
+                    <div className="text-xs font-bold text-slate-800">{item.title}</div>
+                    <div className="text-[11px] text-slate-400">{item.desc}</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = { ...notifications, [item.key]: !notifications[item.key] };
+                      setNotifications(updated);
+                      triggerToast('Notification preferences saved');
+                    }}
+                    className={`w-11 h-6 flex items-center rounded-full p-1 transition cursor-pointer ${
+                      notifications[item.key] ? 'bg-blue-600 justify-end' : 'bg-slate-200 justify-start'
+                    }`}
+                  >
+                    <motion.div layout className="w-4 h-4 bg-white rounded-full shadow-md" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── 4. Security ── */}
+          <div id="security" className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-emerald-600" />
+                <h2 className="text-base font-bold text-slate-800">Security</h2>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {/* Password */}
+              <div className="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl border border-slate-200/80">
+                <div>
+                  <div className="text-xs font-bold text-slate-800">Password</div>
+                  <div className="text-[11px] text-slate-400">Last changed: Never (Registered with password)</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordModal(true)}
+                  className="px-3.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer shadow-xs"
+                >
+                  Change Password
+                </button>
+              </div>
+
+              {/* Active Sessions */}
+              <div className="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl border border-slate-200/80">
+                <div className="flex items-center gap-3">
+                  <Laptop className="w-4 h-4 text-slate-500" />
+                  <div>
+                    <div className="text-xs font-bold text-slate-800 flex items-center gap-2">
+                      <span>Chrome on Windows</span>
+                      <span className="px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[9px] font-extrabold">Active Now</span>
+                    </div>
+                    <div className="text-[11px] text-slate-400">Current session — 127.0.0.1</div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => triggerToast('Logged out of all other sessions')}
+                  className="px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer"
+                >
+                  Manage
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 5. Appearance ── */}
+          <div id="appearance" className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <Palette className="w-4 h-4 text-cyan-600" />
+                <h2 className="text-base font-bold text-slate-800">Appearance</h2>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {/* Theme */}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <div className="text-xs font-bold text-slate-800">Theme</div>
+                  <div className="text-[11px] text-slate-400">Select dashboard theme preference</div>
+                </div>
+                <div className="flex gap-2">
+                  {[
+                    { id: 'light', label: 'Light', icon: Sun },
+                    { id: 'dark', label: 'Dark', icon: Moon },
+                    { id: 'system', label: 'System', icon: Laptop },
+                  ].map((t) => {
+                    const TIcon = t.icon;
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => { setTheme(t.id); triggerToast(`Theme set to ${t.label}`); }}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition border cursor-pointer ${
+                          theme === t.id ? 'bg-blue-50 border-blue-200 text-blue-600 shadow-xs' : 'bg-slate-50 border-slate-200 text-slate-600'
+                        }`}
+                      >
+                        <TIcon className="w-3.5 h-3.5" />
+                        <span>{t.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Compact Layout */}
+              <div className="flex items-center justify-between py-1 border-b border-slate-100">
+                <div>
+                  <div className="text-xs font-bold text-slate-800">Compact Layout</div>
+                  <div className="text-[11px] text-slate-400">Use 20-25% more compact cards & sidebar margins</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setCompactLayout(!compactLayout); triggerToast('Layout density updated'); }}
+                  className={`w-11 h-6 flex items-center rounded-full p-1 transition cursor-pointer ${
+                    compactLayout ? 'bg-blue-600 justify-end' : 'bg-slate-200 justify-start'
+                  }`}
+                >
+                  <motion.div layout className="w-4 h-4 bg-white rounded-full shadow-md" />
+                </button>
+              </div>
+
+              {/* Sidebar Behavior */}
+              <div className="flex items-center justify-between pt-1">
+                <div>
+                  <div className="text-xs font-bold text-slate-800">Sidebar Behavior</div>
+                  <div className="text-[11px] text-slate-400">Default state when navigating pages</div>
+                </div>
+                <select
+                  value={sidebarBehavior}
+                  onChange={(e) => { setSidebarBehavior(e.target.value); triggerToast('Sidebar preference updated'); }}
+                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
+                >
+                  <option value="expanded">Expanded (Default)</option>
+                  <option value="collapsed">Collapsed</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 6. Danger Zone ── */}
+          <div id="danger" className="bg-rose-50/40 rounded-2xl p-6 border border-rose-200/80 shadow-xs space-y-4">
+            <div className="flex items-center gap-2 pb-2 border-b border-rose-200/60">
+              <AlertTriangle className="w-4 h-4 text-rose-600" />
+              <h2 className="text-base font-bold text-rose-800">Danger Zone</h2>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <div className="text-xs font-bold text-rose-900">Delete Account</div>
+                <div className="text-[11px] text-rose-700/80 mt-0.5">
+                  Permanently delete your IdeaExecutor account and all associated data.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(true)}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0 cursor-pointer"
+              >
+                Delete Account
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Change Password Modal ── */}
+      <AnimatePresence>
+        {showPasswordModal && (
+          <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xl max-w-md w-full text-left"
+            >
+              <h3 className="text-base font-bold text-slate-800 mb-1">Change Password</h3>
+              <p className="text-xs text-slate-500 mb-4">Enter your new password details below.</p>
+
+              <form onSubmit={handleChangePassword} className="space-y-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Current Password</label>
+                  <input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">New Password</label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Confirm New Password</label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    required
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 pt-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswordModal(false)}
+                    className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
+                  >
+                    Update Password
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Delete Account Confirmation Modal ── */}
+      <AnimatePresence>
+        {showDeleteModal && (
+          <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xl max-w-md w-full text-left space-y-4"
+            >
+              <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">Delete Account?</h3>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  This action is permanent and cannot be undone. All your saved startup analyses, vectors, and action items will be permanently erased.
                 </p>
               </div>
 
-              <div className="space-y-3">
-                {/* 1. Language */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl hover:bg-slate-50/80 transition gap-3 border border-transparent hover:border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100/60">
-                      <Globe className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-slate-800">Language</div>
-                      <div className="text-[11px] text-slate-450">Choose your preferred language</div>
-                    </div>
-                  </div>
-                  <div className="relative min-w-[200px]">
-                    <select
-                      value={preferences.language}
-                      onChange={(e) => setPreferences({ ...preferences, language: e.target.value })}
-                      className="w-full appearance-none bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 pr-8 focus:outline-none focus:ring-2 focus:ring-purple-500/20 cursor-pointer"
-                    >
-                      <option value="English">English</option>
-                      <option value="Spanish">Spanish</option>
-                      <option value="French">French</option>
-                      <option value="German">German</option>
-                      <option value="Japanese">Japanese</option>
-                    </select>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-3 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* 2. Timezone */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl hover:bg-slate-50/80 transition gap-3 border border-transparent hover:border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100/60">
-                      <Clock className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-slate-800">Timezone</div>
-                      <div className="text-[11px] text-slate-450">Select your timezone</div>
-                    </div>
-                  </div>
-                  <div className="relative min-w-[260px]">
-                    <select
-                      value={preferences.timezone}
-                      onChange={(e) => setPreferences({ ...preferences, timezone: e.target.value })}
-                      className="w-full appearance-none bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 pr-8 focus:outline-none focus:ring-2 focus:ring-purple-500/20 cursor-pointer truncate"
-                    >
-                      <option value="(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi">(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi</option>
-                      <option value="(GMT+00:00) UTC / London">(GMT+00:00) UTC / London</option>
-                      <option value="(GMT-05:00) Eastern Time (US & Canada)">(GMT-05:00) Eastern Time (US & Canada)</option>
-                      <option value="(GMT-08:00) Pacific Time (US & Canada)">(GMT-08:00) Pacific Time (US & Canada)</option>
-                    </select>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-3 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* 3. Default Currency */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl hover:bg-slate-50/80 transition gap-3 border border-transparent hover:border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100/60">
-                      <HelpCircle className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-slate-800">Default Currency</div>
-                      <div className="text-[11px] text-slate-450">Choose your default currency</div>
-                    </div>
-                  </div>
-                  <div className="relative min-w-[200px]">
-                    <select
-                      value={preferences.currency}
-                      onChange={(e) => setPreferences({ ...preferences, currency: e.target.value })}
-                      className="w-full appearance-none bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 pr-8 focus:outline-none focus:ring-2 focus:ring-purple-500/20 cursor-pointer"
-                    >
-                      <option value="INR (₹) Indian Rupee">INR (₹) Indian Rupee</option>
-                      <option value="USD ($) US Dollar">USD ($) US Dollar</option>
-                      <option value="EUR (€) Euro">EUR (€) Euro</option>
-                      <option value="GBP (£) British Pound">GBP (£) British Pound</option>
-                    </select>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-3 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* 4. Default Workspace */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl hover:bg-slate-50/80 transition gap-3 border border-transparent hover:border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100/60">
-                      <Building className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-slate-800">Default Workspace</div>
-                      <div className="text-[11px] text-slate-450">Choose your default workspace</div>
-                    </div>
-                  </div>
-                  <div className="relative min-w-[200px]">
-                    <select
-                      value={preferences.workspace}
-                      onChange={(e) => setPreferences({ ...preferences, workspace: e.target.value })}
-                      className="w-full appearance-none bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 pr-8 focus:outline-none focus:ring-2 focus:ring-purple-500/20 cursor-pointer"
-                    >
-                      <option value="Startup Pilot Idea">Startup Pilot Idea</option>
-                      <option value="FinTech Discovery Lab">FinTech Discovery Lab</option>
-                      <option value="SaaS AI Co-founder">SaaS AI Co-founder</option>
-                    </select>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-3 pointer-events-none" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column (4 cols): Account Summary, Storage Usage, Recent Activity */}
-          <div className="lg:col-span-4 space-y-6">
-            {/* Account Summary Card */}
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-              <div className="flex items-center gap-2 mb-4 pb-1">
-                <User className="w-4 h-4 text-purple-600" />
-                <h3 className="text-sm font-extrabold text-slate-800">Account Summary</h3>
-              </div>
-
-              <div className="space-y-3.5">
-                {/* Account Type */}
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 text-slate-500 font-medium">
-                    <Shield className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Account Type</span>
-                  </div>
-                  <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-100 font-bold text-[11px]">
-                    Founder
-                  </span>
-                </div>
-
-                {/* Member Since */}
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 text-slate-500 font-medium">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Member Since</span>
-                  </div>
-                  <span className="font-bold text-slate-800">Aug 12, 2026</span>
-                </div>
-
-                {/* Workspace */}
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 text-slate-500 font-medium">
-                    <Building className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Workspace</span>
-                  </div>
-                  <span className="font-bold text-slate-800 truncate max-w-[140px]">Startup Pilot Idea</span>
-                </div>
-
-                {/* Plan */}
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 text-slate-500 font-medium">
-                    <CreditCard className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Plan</span>
-                  </div>
-                  <span className="font-bold text-slate-800">Free Plan</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Storage Usage Card */}
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <HardDrive className="w-4 h-4 text-purple-600" />
-                  <h3 className="text-sm font-extrabold text-slate-800">Storage Usage</h3>
-                </div>
-                <span className="text-[11px] font-medium text-slate-400">2.4 GB of 10 GB used</span>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="flex items-center gap-2.5 my-3">
-                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden flex-1">
-                  <div className="h-full rounded-full bg-gradient-to-r from-purple-600 to-indigo-600" style={{ width: '24%' }} />
-                </div>
-                <span className="text-xs font-bold text-slate-700 shrink-0">24%</span>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => alert('Storage management: You have 7.6 GB remaining.')}
-                className="w-full mt-2 py-2 rounded-xl border border-purple-200 text-purple-600 font-bold text-xs hover:bg-purple-50 transition cursor-pointer text-center"
-              >
-                Manage Storage
-              </button>
-            </div>
-
-            {/* Recent Activity Card */}
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-              <div className="flex items-center gap-2 mb-4 pb-1">
-                <Clock className="w-4 h-4 text-purple-600" />
-                <h3 className="text-sm font-extrabold text-slate-800">Recent Activity</h3>
-              </div>
-
-              <div className="space-y-3.5">
-                {/* 1. Market analysis */}
-                <div className="flex items-center justify-between text-xs gap-2">
-                  <div className="flex items-center gap-2.5 truncate">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100/60">
-                      <FileText className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="font-semibold text-slate-700 truncate">Market analysis completed</span>
-                  </div>
-                  <span className="text-[11px] text-slate-400 shrink-0">2 hours ago</span>
-                </div>
-
-                {/* 2. Document uploaded */}
-                <div className="flex items-center justify-between text-xs gap-2">
-                  <div className="flex items-center gap-2.5 truncate">
-                    <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100/60">
-                      <Upload className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="font-semibold text-slate-700 truncate">Document uploaded <span className="text-slate-400 block sm:inline text-[10px]">AI_Market_Report.pdf</span></span>
-                  </div>
-                  <span className="text-[11px] text-slate-400 shrink-0">5 hours ago</span>
-                </div>
-
-                {/* 3. Revenue forecast */}
-                <div className="flex items-center justify-between text-xs gap-2">
-                  <div className="flex items-center gap-2.5 truncate">
-                    <div className="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100/60">
-                      <TrendingUp className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="font-semibold text-slate-700 truncate">Revenue forecast generated</span>
-                  </div>
-                  <span className="text-[11px] text-slate-400 shrink-0">1 day ago</span>
-                </div>
-
-                {/* 4. Profile updated */}
-                <div className="flex items-center justify-between text-xs gap-2">
-                  <div className="flex items-center gap-2.5 truncate">
-                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100/60">
-                      <User className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="font-semibold text-slate-700 truncate">Profile updated</span>
-                  </div>
-                  <span className="text-[11px] text-slate-400 shrink-0">2 days ago</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Security Tab Content ── */}
-      {activeTab === 'Security' && (
-        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm max-w-3xl space-y-6">
-          <div>
-            <h2 className="text-base sm:text-lg font-extrabold text-slate-800 tracking-tight">Security & Authentication</h2>
-            <p className="text-xs text-slate-450 font-medium mt-0.5">Manage your password, login sessions and multi-factor security.</p>
-          </div>
-          <div className="space-y-4 pt-2">
-            <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">New Password</label>
-              <input
-                type="password"
-                placeholder="Minimum 6 characters"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-              />
-            </div>
-            <button
-              onClick={() => alert('Password updated')}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer"
-            >
-              Update Password
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── Workspace Tab Content ── */}
-      {activeTab === 'Workspace' && (
-        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm max-w-3xl space-y-6">
-          <div>
-            <h2 className="text-base sm:text-lg font-extrabold text-slate-800 tracking-tight">Workspace Management</h2>
-            <p className="text-xs text-slate-450 font-medium mt-0.5">Manage team members, roles and shared startup assets.</p>
-          </div>
-          <div className="space-y-4 pt-2">
-            <div className="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-xs">S</div>
-                <div>
-                  <div className="text-xs font-bold text-slate-800">{profile.fullName} (You)</div>
-                  <div className="text-[10px] text-slate-450">{profile.email}</div>
-                </div>
-              </div>
-              <span className="text-[11px] font-bold px-2.5 py-0.5 bg-purple-100 text-purple-700 rounded-full">Owner / Founder</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Billing Tab Content ── */}
-      {activeTab === 'Billing' && (
-        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm max-w-3xl space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-base sm:text-lg font-extrabold text-slate-800 tracking-tight">Billing & Plans</h2>
-              <p className="text-xs text-slate-450 font-medium mt-0.5">Manage your subscription, invoices and payment methods.</p>
-            </div>
-            <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
-              Active: Free Plan
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* ── Notifications Tab Content ── */}
-      {activeTab === 'Notifications' && (
-        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm max-w-3xl space-y-6">
-          <div>
-            <h2 className="text-base sm:text-lg font-extrabold text-slate-800 tracking-tight">Notification Channels</h2>
-            <p className="text-xs text-slate-450 font-medium mt-0.5">Control how and when IdeaExecutor notifies you.</p>
-          </div>
-          <div className="space-y-3 pt-2">
-            {['Morning AI Founder Brief', 'Competitor & Market Alerts', 'Roadmap Milestone Reminders'].map((title, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:bg-slate-50">
-                <div className="text-xs font-bold text-slate-800">{title}</div>
-                <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600 rounded cursor-pointer" />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── Integrations Tab Content ── */}
-      {activeTab === 'Integrations' && (
-        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm max-w-3xl space-y-6">
-          <div>
-            <h2 className="text-base sm:text-lg font-extrabold text-slate-800 tracking-tight">Connected Integrations</h2>
-            <p className="text-xs text-slate-450 font-medium mt-0.5">Connect external platforms to sync market data and documents.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-            {['Google Drive', 'GitHub', 'Slack', 'Notion'].map((name, idx) => (
-              <div key={idx} className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                <div className="text-xs font-bold text-slate-800">{name}</div>
-                <button onClick={() => alert(`Connected to ${name}`)} className="px-3 py-1 rounded-lg border border-purple-200 text-purple-600 text-xs font-bold hover:bg-purple-50 cursor-pointer">
-                  Connect
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteModal(false)}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer"
+                >
+                  Confirm Delete
                 </button>
               </div>
-            ))}
+            </motion.div>
           </div>
-        </div>
-      )}
-
-      {/* ── Footer ── */}
-      <footer className="pt-8 border-t border-slate-200/60 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-3">
-        <div>© 2026 IdeaExecutor. All rights reserved.</div>
-        <div className="flex items-center gap-4">
-          <span className="hover:text-purple-600 cursor-pointer transition">Privacy Policy</span>
-          <span className="hover:text-purple-600 cursor-pointer transition">Terms of Service</span>
-          <span className="hover:text-purple-600 cursor-pointer transition">Help Center</span>
-        </div>
-      </footer>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
