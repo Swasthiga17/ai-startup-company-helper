@@ -212,11 +212,10 @@ export default function Sidebar() {
               <button
                 key={section.id}
                 onClick={() => navigate(section.path)}
-                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  active
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${active
                     ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-xs'
                     : 'text-slate-300 hover:text-white hover:bg-white/10'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2.5">
                   <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-pink-300'}`} />
@@ -234,11 +233,10 @@ export default function Sidebar() {
               {/* Section Header Accordion Trigger */}
               <button
                 onClick={() => toggleSection(section.id)}
-                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  hasActiveChild
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${hasActiveChild
                     ? 'bg-white/10 text-white border-l-2 border-pink-500'
                     : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2.5">
                   <Icon className={`w-3.5 h-3.5 ${hasActiveChild ? 'text-pink-400' : 'text-purple-300'}`} />
@@ -268,11 +266,10 @@ export default function Sidebar() {
                         <button
                           key={sub.label + sub.path}
                           onClick={() => navigate(sub.path)}
-                          className={`w-full flex items-center gap-2 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer ${
-                            active
+                          className={`w-full flex items-center gap-2 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer ${active
                               ? 'bg-gradient-to-r from-pink-600/80 to-purple-600/80 text-white font-bold shadow-xs'
                               : 'text-slate-400 hover:text-white hover:bg-white/5'
-                          }`}
+                            }`}
                         >
                           <SubIcon className={`w-3 h-3 ${active ? 'text-white' : 'text-slate-400'}`} />
                           <span className="truncate">{sub.label}</span>

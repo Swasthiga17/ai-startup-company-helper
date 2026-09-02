@@ -26,9 +26,15 @@ export default function Login() {
               navigate('/dashboard');
               return;
             }
+            navigate('/onboarding');
+            return;
+          } else {
+            // Token expired or invalid - clear it so user can log in with their credentials
+            localStorage.removeItem('token');
           }
-        } catch { }
-        navigate('/onboarding');
+        } catch {
+          localStorage.removeItem('token');
+        }
       };
       checkHistory();
     }
