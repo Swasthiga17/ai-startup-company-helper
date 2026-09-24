@@ -1,0 +1,11 @@
+node_modules
+.venv*
+.git
+backend
+startup.db
+*.log
+dist
+.pytest_cache
+__pycache__
+uploads
+output

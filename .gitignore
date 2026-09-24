@@ -23,3 +23,5 @@ uploads/
 backend/startup_docs/
 backend/chroma_db/
 startup_guide.txt
+.vercel
+.env*

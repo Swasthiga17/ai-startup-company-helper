@@ -50,7 +50,10 @@ if cors_origins_env and cors_origins_env.strip() != "*":
         "https://buildyourowncompanyusingaibss.netlify.app",
         "https://ideaexecutor.onrender.com",
         "https://ai-startup-company-helpe.onrender.com",
-        "https://ai-startup-company-helper.onrender.com"
+        "https://ai-startup-company-helper.onrender.com",
+        "https://ideaexecutor.vercel.app",
+        "https://frontend-two-drab-49.vercel.app",
+        "https://frontend-hov8zzrck-swasthi.vercel.app"
     ]:
         if default_origin not in allowed_origins:
             allowed_origins.append(default_origin)
@@ -68,7 +71,10 @@ else:
         "https://buildyourowncompanyusingaibss.netlify.app",
         "https://ideaexecutor.onrender.com",
         "https://ai-startup-company-helpe.onrender.com",
-        "https://ai-startup-company-helper.onrender.com"
+        "https://ai-startup-company-helper.onrender.com",
+        "https://ideaexecutor.vercel.app",
+        "https://frontend-two-drab-49.vercel.app",
+        "https://frontend-hov8zzrck-swasthi.vercel.app"
     ]
 
 app.add_middleware(

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, Mail, Lock, Eye, EyeOff, Building, Globe, Briefcase, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
+import { API_BASE } from '../config';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ export default function Register() {
     if (token) {
       const checkHistory = async () => {
         try {
-          const histResp = await fetch(`${import.meta.env.VITE_API_URL || ''}/history`, {
+          const histResp = await fetch(`${API_BASE}/history`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (histResp.ok) {
@@ -60,7 +61,7 @@ export default function Register() {
     }
 
     try {
-      const resp = await fetch(`${import.meta.env.VITE_API_URL || ''}/auth/register`, {
+      const resp = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: fullName, email, password, startupName, country, stage }),

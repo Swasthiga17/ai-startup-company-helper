@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, Lock, Eye, EyeOff, ArrowRight, Lightbulb, Target, TrendingUp, CheckCircle2 } from 'lucide-react';
+import { API_BASE } from '../config';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function Login() {
     if (token) {
       const checkHistory = async () => {
         try {
-          const histResp = await fetch(`${import.meta.env.VITE_API_URL || ''}/history`, {
+          const histResp = await fetch(`${API_BASE}/history`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (histResp.ok) {
@@ -46,7 +47,7 @@ export default function Login() {
     if (!email || !password) return;
 
     try {
-      const resp = await fetch(`${import.meta.env.VITE_API_URL || ''}/auth/login`, {
+      const resp = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

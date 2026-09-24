@@ -1,8 +1,7 @@
 import { io } from 'socket.io-client';
+import { API_BASE } from '../config';
 
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-
-export const socket = io(SOCKET_URL, {
+export const socket = io(API_BASE, {
   path: '/socket.io',
   autoConnect: true,
   reconnection: true,
