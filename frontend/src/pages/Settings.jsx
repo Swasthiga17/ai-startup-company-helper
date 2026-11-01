@@ -18,8 +18,8 @@ import api from '../services/api';
 const Settings = () => {
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState({
-    name: 'Swasthiga B S',
-    email: 'swasthiga@example.com'
+    name: '',
+    email: ''
   });
   const [saveToast, setSaveToast] = useState(false);
 
@@ -29,49 +29,7 @@ const Settings = () => {
     navigate('/login');
   };
 
-  // Default fallback startups
-  const [createdStartups, setCreatedStartups] = useState([
-    {
-      id: 1,
-      name: 'SupportMind AI',
-      industry: 'Artificial Intelligence',
-      country: 'United States',
-      stage: 'Idea Stage',
-      score: 80,
-      createdAt: '2/9/2026',
-      active: true
-    },
-    {
-      id: 2,
-      name: 'TeleHealth AI',
-      industry: 'Healthcare',
-      country: 'United States',
-      stage: 'Idea Stage',
-      score: 80,
-      createdAt: '2/9/2026',
-      active: false
-    },
-    {
-      id: 3,
-      name: 'SupportMind AI',
-      industry: 'Artificial Intelligence',
-      country: 'United States',
-      stage: 'Idea Stage',
-      score: 78,
-      createdAt: '26/8/2026',
-      active: false
-    },
-    {
-      id: 4,
-      name: 'TeleHealth AI',
-      industry: 'Healthcare',
-      country: 'United States',
-      stage: 'Idea Stage',
-      score: 76,
-      createdAt: '26/8/2026',
-      active: false
-    }
-  ]);
+  const [createdStartups, setCreatedStartups] = useState([]);
 
   // Fetch logged in account details & user startups
   useEffect(() => {
@@ -80,17 +38,17 @@ const Settings = () => {
         const meResp = await api.get('/auth/me');
         if (meResp.data) {
           setUserProfile({
-            name: meResp.data.name || 'Swasthiga B S',
-            email: meResp.data.email || 'swasthiga@example.com'
+            name: meResp.data.name || '',
+            email: meResp.data.email || ''
           });
         }
       } catch (err) {
-        console.log('Using default profile credentials');
+        console.log('Failed to fetch profile info:', err);
       }
 
       try {
         const histResp = await api.get('/history');
-        if (histResp.data && histResp.data.length > 0) {
+        if (histResp.data && Array.isArray(histResp.data)) {
           const mapped = histResp.data.map((item, idx) => ({
             id: item.id || idx + 1,
             name: item.idea_title || item.startup_name || item.name || `Startup Idea #${idx + 1}`,
@@ -102,9 +60,12 @@ const Settings = () => {
             active: idx === 0
           }));
           setCreatedStartups(mapped);
+        } else {
+          setCreatedStartups([]);
         }
       } catch (err) {
-        console.log('Using default history list');
+        console.log('Failed to fetch user history:', err);
+        setCreatedStartups([]);
       }
     };
     fetchAccount();
@@ -189,8 +150,22 @@ const Settings = () => {
 
 
           {/* Startup Cards */}
-
-          <div className="grid md:grid-cols-2 gap-4">
+          {createdStartups.length === 0 ? (
+            <div className="text-center py-10 px-4 bg-slate-50 border border-dashed border-slate-200 rounded-2xl">
+              <Rocket className="w-10 h-10 text-purple-400 mx-auto mb-2 opacity-75" />
+              <h3 className="text-sm font-bold text-slate-800">No Startups Analyzed Yet</h3>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                Create and analyze your first startup idea to populate your workspace.
+              </p>
+              <button
+                onClick={() => navigate('/input')}
+                className="mt-4 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl text-xs font-bold shadow-sm hover:opacity-95 transition cursor-pointer"
+              >
+                + New Idea Analysis
+              </button>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-4">
 
             {createdStartups.map((startup) => (
 
@@ -320,9 +295,8 @@ const Settings = () => {
               </div>
 
             ))}
-
           </div>
-
+          )}
         </section>
 
 

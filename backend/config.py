@@ -4,9 +4,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-default_db_path = os.path.join(BASE_DIR, "startup.db")
+
+# Prefer persistent disk mount (Render mounts disk at /app/chroma_db or CHROMA_PATH)
+chroma_path = os.getenv("CHROMA_PATH", "")
+if os.path.exists("/app/chroma_db"):
+    default_db_path = "/app/chroma_db/startup.db"
+elif chroma_path and os.path.isdir(chroma_path):
+    default_db_path = os.path.join(chroma_path, "startup.db")
+else:
+    default_db_path = os.path.join(BASE_DIR, "startup.db")
+
 default_sqlite_url = f"sqlite:///{default_db_path.replace(os.sep, '/')}"
 
 raw_db_url = os.getenv("DATABASE_URL")

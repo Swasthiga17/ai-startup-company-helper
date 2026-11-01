@@ -23,8 +23,9 @@ const pageDescriptions = {
 export default function TopBar({ title }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { downloadPdf, downloadPptx } = useApp();
+  const { downloadPdf, downloadPptx, user } = useApp();
 
+  const initial = ((user?.name || user?.email || 'U').trim()[0] || 'U').toUpperCase();
   const displayTitle = title || (location.pathname === '/dashboard' || location.pathname === '/' ? 'Executive Summary' : 'AI Analysis Hub');
   const description = pageDescriptions[location.pathname] || 'AI-Powered Startup Acceleration Platform';
 
@@ -110,7 +111,7 @@ export default function TopBar({ title }) {
           className="w-8 h-8 rounded-full bg-purple-600 text-white font-bold text-xs flex items-center justify-center ring-2 ring-white/30 shadow-sm cursor-pointer ml-0.5"
           title="Profile & Settings"
         >
-          S
+          {initial}
         </motion.button>
       </div>
     </motion.header>

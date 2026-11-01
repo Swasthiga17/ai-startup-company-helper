@@ -1,11 +1,8 @@
 import React from 'react';
-import { createContext, useState, useCallback } from 'react';
-import { analyzeStartup, downloadPdf as dlPdf, downloadPptx as dlPptx, sendChatMessage, getHistory, generateDocument, deleteWorkspace } from '../services/api';
+import { createContext, useState, useCallback, useEffect } from 'react';
+import { analyzeStartup, downloadPdf as dlPdf, downloadPptx as dlPptx, sendChatMessage, getHistory, generateDocument, deleteWorkspace, getCurrentUser } from '../services/api';
 import PushToast from '../components/PushToast';
 import { sendPushNotification, requestNotificationPermission } from '../utils/pushNotification';
-
-
-
 
 const getToken = () => {
   try {
@@ -18,6 +15,7 @@ const getToken = () => {
 export const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
+  const [user, setUser] = useState(null);
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -28,6 +26,26 @@ export function AppProvider({ children }) {
     { id: 2, type: 'info', text: 'System Analysis Engine v2.0 Online', time: '5 mins ago' },
     { id: 3, type: 'success', text: 'Pitch Deck PDF Document Ready', time: '10 mins ago' },
   ]);
+
+  const loadUser = useCallback(async () => {
+    const token = getToken();
+    if (!token) {
+      setUser(null);
+      return null;
+    }
+    try {
+      const data = await getCurrentUser();
+      setUser(data);
+      return data;
+    } catch {
+      setUser(null);
+      return null;
+    }
+  }, []);
+
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
 
   const loadStartups = useCallback(async () => {
     setLoading(true);
@@ -209,6 +227,9 @@ export function AppProvider({ children }) {
 
   return (
     <AppContext.Provider value={{ 
+      user,
+      setUser,
+      loadUser,
       analysis, 
       loading, 
       error, 

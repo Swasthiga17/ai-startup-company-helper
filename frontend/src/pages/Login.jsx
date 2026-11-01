@@ -29,12 +29,12 @@ export default function Login() {
             }
             navigate('/onboarding');
             return;
-          } else {
+          } else if (histResp.status === 401 || histResp.status === 403) {
             // Token expired or invalid - clear it so user can log in with their credentials
             localStorage.removeItem('token');
           }
         } catch {
-          localStorage.removeItem('token');
+          // Do not delete token on cold start or network failure so session persists
         }
       };
       checkHistory();

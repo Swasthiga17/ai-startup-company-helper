@@ -49,7 +49,7 @@ const DEFAULT_NOTES = [
 ];
 
 const DEFAULT_MEETINGS = [
-  { id: 1, title: 'Kickoff & Role Setup', date: '2026-07-10', summary: 'Defined initial roles. Swasthiga assigned as Lead Builder. Setup core MVP timelines and target SaaS TAM parameters.' }
+  { id: 1, title: 'Kickoff & Role Setup', date: '2026-07-10', summary: 'Defined initial roles and founder responsibilities. Setup core MVP timelines and target SaaS TAM parameters.' }
 ];
 
 const DEFAULT_MEMBERS = [
