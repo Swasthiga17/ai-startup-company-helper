@@ -32,3 +32,18 @@ class UsageRecord(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     user = relationship("User")
+
+
+class BillingEvent(Base):
+    __tablename__ = "billing_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    event_id = Column(String(128), unique=True, index=True, nullable=False)
+    event_type = Column(String(64), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
+    provider = Column(String(32), default="stripe", nullable=False)
+    payload = Column(Text, nullable=True)
+    status = Column(String(32), default="processed", nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    user = relationship("User")

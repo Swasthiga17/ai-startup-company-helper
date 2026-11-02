@@ -146,4 +146,59 @@ export async function getCurrentUser() {
   return response.data;
 }
 
+export async function getNotifications() {
+  const response = await api.get('/notifications');
+  return response.data;
+}
+
+export async function sendPushNotification(title, message, type = 'info') {
+  const response = await api.post('/notifications/push', { title, message, type });
+  return response.data;
+}
+
+export async function markNotificationRead(notificationId) {
+  const response = await api.patch(`/notifications/${notificationId}/read`);
+  return response.data;
+}
+
+export async function deleteNotification(notificationId) {
+  const response = await api.delete(`/notifications/${notificationId}`);
+  return response.data;
+}
+
+export async function clearNotifications() {
+  const response = await api.delete('/notifications');
+  return response.data;
+}
+
+export async function requestPasswordReset(email) {
+  const response = await api.post('/auth/forgot-password', { email });
+  return response.data;
+}
+
+export async function confirmPasswordReset(token, new_password) {
+  const response = await api.post('/auth/reset-password', { token, new_password });
+  return response.data;
+}
+
+export async function getSubscription() {
+  const response = await api.get('/billing/subscription');
+  return response.data;
+}
+
+export async function createCheckoutSession(plan_id) {
+  const response = await api.post('/billing/checkout', { plan_id });
+  return response.data;
+}
+
+export async function cancelSubscription() {
+  const response = await api.post('/billing/cancel-subscription');
+  return response.data;
+}
+
+export async function getBillingHistory() {
+  const response = await api.get('/billing/history');
+  return response.data;
+}
+
 export default api;

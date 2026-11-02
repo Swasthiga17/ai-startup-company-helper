@@ -5,7 +5,11 @@ export const socket = io(API_BASE, {
   path: '/socket.io',
   autoConnect: true,
   reconnection: true,
-  transports: ['websocket', 'polling']
+  transports: ['websocket', 'polling'],
+  auth: (cb) => {
+    const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+    cb({ token });
+  }
 });
 
 socket.on('connect', () => {

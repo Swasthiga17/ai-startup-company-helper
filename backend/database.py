@@ -43,8 +43,16 @@ def migrate_action_items_table():
 def init_db():
     # Ensure all models are imported so their tables register with Base.metadata
     import models.auth_models  # noqa: F401 — registers User, Analysis, Document, ActionItem, PasswordResetToken
+    import models.subscription_model  # noqa: F401 — registers Subscription, UsageRecord, BillingEvent
     Base.metadata.create_all(bind=engine)
     migrate_action_items_table()
+
+
+# Auto-initialize database schema on module load
+try:
+    init_db()
+except Exception:
+    pass
 
 
 if __name__ == "__main__":

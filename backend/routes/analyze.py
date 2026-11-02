@@ -181,22 +181,43 @@ async def chat(request: ChatRequest, current_user=Depends(get_current_user)):
                 "target_route": "/pitch-deck"
             })
 
-        if model is not None and GEMINI_AVAILABLE:
-            prompt = f"""
-            You are an expert AI Co-Founder and startup mentor. Act as an intelligent virtual founding team member.
+        # RAG Context Retrieval with Graceful Fallback
+        rag_context = ""
+        rag_info = {}
+        try:
+            rag_info = build_rag_context(query=request.message, user_id=current_user.id)
+            if rag_info and rag_info.get("has_evidence") and rag_info.get("context_text"):
+                rag_context = f"\nRelevant Internal Documents:\n{rag_info['context_text']}"
+        except Exception as rag_err:
+            logger.warning(f"RAG context retrieval failed gracefully: {rag_err}")
+            rag_context = ""
 
-            {memory_ctx}
+        prompt = f"""
+        You are an expert AI Co-Founder and startup mentor. Act as an intelligent virtual founding team member.
 
-            {rag_context}
+        {memory_ctx}
 
-            Founder Question: {request.message}
+        {rag_context}
 
-            Provide actionable, specific, and personalized startup guidance based on the persistent context above.
-            """
+        Founder Question: {request.message}
+
+        Provide actionable, specific, and personalized startup guidance based on the persistent context above.
+        """
+
+        from services.llm_service import llm_service
+        reply_text = None
+        if llm_service and llm_service.available:
+            reply_text = llm_service.generate_text(prompt)
+
+        if not reply_text and model is not None and GEMINI_AVAILABLE:
             response = model.generate_content(prompt)
-            return JSONResponse(content={"reply": response.text})
+            if response and response.text:
+                reply_text = response.text
+
+        if reply_text:
+            return JSONResponse(content={"reply": reply_text})
         else:
-            raise Exception("Gemini not available")
+            raise Exception("Gemini not available or rate limited")
     except Exception as e:
         logger.error(f"Chat failed (using fallback): {e}")
         msg = request.message.lower()
@@ -223,27 +244,37 @@ async def chat(request: ChatRequest, current_user=Depends(get_current_user)):
 @router.post("/ai/document/generate")
 async def generate_document_endpoint(request: GenerateDocRequest, current_user=Depends(get_current_user)):
     try:
-        if model is not None and GEMINI_AVAILABLE:
-            prompt = f"""
-            You are an expert startup strategist and copywriter.
-            Generate a professional '{request.docType}' document for the following startup idea:
-            "{request.idea}"
+        prompt = f"""
+        You are an expert startup strategist and copywriter.
+        Generate a professional '{request.docType}' document for the following startup idea:
+        "{request.idea}"
 
-            The document type is defined as:
-            - business_plan: Detailed business plan outlining description, market, model, etc.
-            - executive_summary: A high-impact executive summary.
-            - one_pager: A one-page investor teaser sheet.
-            - investor_email: A brief, professional email pitch to a VC.
-            - cold_email: A cold outreach email template for partners/customers.
-            - linkedin_pitch: A short LinkedIn connection message (under 300 characters).
-            - elevator_pitch: A 30-second elevator pitch script.
+        The document type is defined as:
+        - business_plan: Detailed business plan outlining description, market, model, etc.
+        - executive_summary: A high-impact executive summary.
+        - one_pager: A one-page investor teaser sheet.
+        - investor_email: A brief, professional email pitch to a VC.
+        - cold_email: A cold outreach email template for partners/customers.
+        - linkedin_pitch: A short LinkedIn connection message (under 300 characters).
+        - elevator_pitch: A 30-second elevator pitch script.
 
-            Please structure the output beautifully using plain text (or markdown where appropriate) with clear sections and headings. Make the content realistic, compelling, and ready to send.
-            """
+        Please structure the output beautifully using plain text (or markdown where appropriate) with clear sections and headings. Make the content realistic, compelling, and ready to send.
+        """
+
+        from services.llm_service import llm_service
+        doc_text = None
+        if llm_service and llm_service.available:
+            doc_text = llm_service.generate_text(prompt)
+
+        if not doc_text and model is not None and GEMINI_AVAILABLE:
             response = model.generate_content(prompt)
-            return JSONResponse(content={"status": "success", "content": response.text})
+            if response and response.text:
+                doc_text = response.text
+
+        if doc_text:
+            return JSONResponse(content={"status": "success", "content": doc_text})
         else:
-            raise Exception("Gemini not available")
+            raise Exception("Gemini not available or rate limited")
     except Exception as e:
         logger.error(f"Document generation failed (using fallback): {e}")
 

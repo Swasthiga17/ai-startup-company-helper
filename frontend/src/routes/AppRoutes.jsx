@@ -24,6 +24,8 @@ import Chat from '../pages/Chat';
 import Documents from '../pages/Documents';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
+import ForgotPassword from '../pages/ForgotPassword';
+import ResetPassword from '../pages/ResetPassword';
 import OnboardingShowcase from '../pages/OnboardingShowcase';
 import BuildSphereOnboarding from '../pages/BuildSphereOnboarding';
 import Marketing from '../pages/Marketing';
@@ -105,6 +107,8 @@ export default function AppRoutes() {
         <Route path="/showcase" element={<OnboardingShowcase />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         <Route path="/input" element={<ProtectedRoute><InputPage /></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><Layout title={titles['/dashboard']}><Dashboard /></Layout></ProtectedRoute>} />

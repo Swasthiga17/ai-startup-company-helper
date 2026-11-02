@@ -33,6 +33,8 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    from config import validate_configuration
+    validate_configuration()
     init_db()
     yield
 

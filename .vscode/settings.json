@@ -1,5 +1,14 @@
 {
     "python-envs.defaultEnvManager": "ms-python.python:system",
     "python.defaultInterpreterPath": "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./backend",
+        "-p",
+        "*test.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true
 }

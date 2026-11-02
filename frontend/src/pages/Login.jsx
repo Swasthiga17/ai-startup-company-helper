@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, Lock, Eye, EyeOff, ArrowRight, Lightbulb, Target, TrendingUp, CheckCircle2 } from 'lucide-react';
 import { API_BASE } from '../config';
@@ -207,12 +207,12 @@ export default function Login() {
                 </button>
               </div>
               <div className="text-right mt-1.5">
-                <span
-                  onClick={() => alert('Password reset link sent to your email.')}
+                <Link
+                  to="/forgot-password"
                   className="text-xs text-[#FF4FA3] hover:underline font-semibold cursor-pointer"
                 >
                   Forgot password?
-                </span>
+                </Link>
               </div>
             </div>
 

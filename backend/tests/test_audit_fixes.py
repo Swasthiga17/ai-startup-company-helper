@@ -81,13 +81,19 @@ class TestAuditFixesSuite(unittest.IsolatedAsyncioTestCase):
         res_forgot = await self.client.post("/auth/forgot-password", json={"email": "regular_founder@example.com"})
         self.assertEqual(res_forgot.status_code, 200)
         data = res_forgot.json()
-        token = data.get("reset_token")
-        self.assertIsNotNone(token, "Reset token must be generated")
+        self.assertEqual(data.get("status"), "success")
+        self.assertNotIn("reset_token", data, "Reset token must never be exposed in API response")
 
-        # Verify token exists in database
+        from services.email_service import email_service
+        import hashlib
+        token = email_service.get_latest_reset_token("regular_founder@example.com")
+        self.assertIsNotNone(token, "Reset token must be generated and dispatched")
+
+        # Verify token hash exists in database (raw token is never stored)
+        token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
         db = SessionLocal()
         try:
-            token_rec = db.query(PasswordResetToken).filter(PasswordResetToken.token == token).first()
+            token_rec = db.query(PasswordResetToken).filter(PasswordResetToken.token == token_hash).first()
             self.assertIsNotNone(token_rec)
             self.assertFalse(token_rec.used)
         finally:

@@ -1,6 +1,18 @@
 import React from 'react';
 import { createContext, useState, useCallback, useEffect } from 'react';
-import { analyzeStartup, downloadPdf as dlPdf, downloadPptx as dlPptx, sendChatMessage, getHistory, generateDocument, deleteWorkspace, getCurrentUser } from '../services/api';
+import { 
+  analyzeStartup, 
+  downloadPdf as dlPdf, 
+  downloadPptx as dlPptx, 
+  sendChatMessage, 
+  getHistory, 
+  generateDocument, 
+  deleteWorkspace, 
+  getCurrentUser,
+  getNotifications,
+  sendPushNotification as sendPushNotifApi
+} from '../services/api';
+import { socket } from '../services/socket';
 import PushToast from '../components/PushToast';
 import { sendPushNotification, requestNotificationPermission } from '../utils/pushNotification';
 
@@ -27,6 +39,19 @@ export function AppProvider({ children }) {
     { id: 3, type: 'success', text: 'Pitch Deck PDF Document Ready', time: '10 mins ago' },
   ]);
 
+  const loadNotifications = useCallback(async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const data = await getNotifications();
+      if (data?.notifications && Array.isArray(data.notifications) && data.notifications.length > 0) {
+        setNotifications(data.notifications);
+      }
+    } catch {
+      // Fallback to local state if fetch fails
+    }
+  }, []);
+
   const loadUser = useCallback(async () => {
     const token = getToken();
     if (!token) {
@@ -36,16 +61,46 @@ export function AppProvider({ children }) {
     try {
       const data = await getCurrentUser();
       setUser(data);
+      loadNotifications();
       return data;
     } catch {
       setUser(null);
       return null;
     }
-  }, []);
+  }, [loadNotifications]);
 
   useEffect(() => {
     loadUser();
   }, [loadUser]);
+
+  useEffect(() => {
+    const handlePush = (data) => {
+      if (!data) return;
+      const title = data.title || 'Notification';
+      const message = data.message || '';
+      const type = data.type || 'info';
+
+      sendPushNotification(title, message);
+      setActiveToast({ title, message, type });
+      setTimeout(() => setActiveToast(null), 4000);
+
+      setNotifications((prev) => [
+        {
+          id: data.id || Date.now(),
+          type,
+          text: data.text || `${title}: ${message}`,
+          time: data.time || 'Just now',
+          read: data.read || false,
+        },
+        ...prev.filter((n) => n.id !== data.id),
+      ]);
+    };
+
+    socket.on('push_notification', handlePush);
+    return () => {
+      socket.off('push_notification', handlePush);
+    };
+  }, []);
 
   const loadStartups = useCallback(async () => {
     setLoading(true);
@@ -181,7 +236,7 @@ export function AppProvider({ children }) {
   const [activeToast, setActiveToast] = useState(null);
 
 
-  const triggerPushNotification = useCallback((title, message, type = 'success') => {
+  const triggerPushNotification = useCallback(async (title, message, type = 'success') => {
     // 1. Desktop push notification
     sendPushNotification(title, message);
 
@@ -189,11 +244,25 @@ export function AppProvider({ children }) {
     setActiveToast({ title, message, type });
     setTimeout(() => setActiveToast(null), 4000);
 
-    // 3. Add to notifications list
+    // 3. Add to notifications list immediately
+    const tempId = Date.now();
     setNotifications(prev => [
-      { id: Date.now(), type, text: `${title}: ${message}`, time: 'Just now' },
+      { id: tempId, type, text: `${title}: ${message}`, time: 'Just now' },
       ...prev
     ]);
+
+    // 4. Persist to backend database if authenticated
+    const token = getToken();
+    if (token) {
+      try {
+        const res = await sendPushNotifApi(title, message, type);
+        if (res?.notification?.id) {
+          setNotifications(prev => prev.map(n => n.id === tempId ? res.notification : n));
+        }
+      } catch {
+        // Fallback: local notification already visible
+      }
+    }
   }, []);
 
   const removeStartup = useCallback(async (id) => {

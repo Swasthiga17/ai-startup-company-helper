@@ -112,7 +112,7 @@ def ingest_document_chunks(doc_id: int, user_id: int, filename: str, chunks_data
 
 
 def delete_document_chunks(doc_id: int, user_id: int) -> bool:
-    """Deletes all vector chunks belonging to a document from ChromaDB."""
+    """Deletes all vector chunks belonging to a document from ChromaDB strictly for the specified user."""
     db = get_chroma_db()
     if not db:
         return False
@@ -122,11 +122,21 @@ def delete_document_chunks(doc_id: int, user_id: int) -> bool:
         logger.info(f"Deleted chunks for doc_id {doc_id} user_id {user_id} from ChromaDB.")
         return True
     except Exception as e:
-        logger.warning(f"Metadata filter deletion failed, trying direct ID lookup: {e}")
+        logger.warning(f"Compound filter deletion failed ({e}), attempting user-scoped ID fallback:")
         try:
-            db.delete(where={"document_id": doc_id})
-            return True
-        except Exception:
+            # Safe user-scoped fallback: Never delete by doc_id alone
+            prefix = f"doc_{doc_id}_u_{user_id}_"
+            col = getattr(db, "_collection", None)
+            if col:
+                existing = col.get(where={"user_id": user_id})
+                ids_to_del = [cid for cid in existing.get("ids", []) if cid.startswith(prefix)]
+                if ids_to_del:
+                    col.delete(ids=ids_to_del)
+                    logger.info(f"Deleted {len(ids_to_del)} chunks via user-scoped IDs.")
+                    return True
+            return False
+        except Exception as e2:
+            logger.error(f"Failed to delete chunks for doc_id {doc_id} user_id {user_id}: {e2}")
             return False
 
 

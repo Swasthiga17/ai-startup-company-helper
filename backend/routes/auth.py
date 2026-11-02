@@ -126,6 +126,68 @@ async def me(current_user: User = Depends(get_current_user)):
     return UserPublic(id=current_user.id, name=current_user.name, email=current_user.email)
 
 
+from fastapi import Request
+import hashlib
+import time
+from collections import defaultdict
+from config import PASSWORD_RESET_TOKEN_EXPIRE_MINUTES
+from services.email_service import email_service
+
+
+class PasswordRecoveryRateLimiter:
+    """Sliding-window rate limiter for forgot-password requests by IP and email."""
+
+    def __init__(self, max_per_ip: int = 5, max_per_email: int = 3, window_seconds: int = 900):
+        self.max_per_ip = max_per_ip
+        self.max_per_email = max_per_email
+        self.window_seconds = window_seconds
+        self.ip_timestamps: dict[str, list[float]] = defaultdict(list)
+        self.email_timestamps: dict[str, list[float]] = defaultdict(list)
+
+    def check_and_record(self, ip: str, email: str) -> bool:
+        now = time.time()
+        cutoff = now - self.window_seconds
+
+        self.ip_timestamps[ip] = [t for t in self.ip_timestamps[ip] if t > cutoff]
+        self.email_timestamps[email] = [t for t in self.email_timestamps[email] if t > cutoff]
+
+        if len(self.ip_timestamps[ip]) >= self.max_per_ip:
+            return False
+        if len(self.email_timestamps[email]) >= self.max_per_email:
+            return False
+
+        self.ip_timestamps[ip].append(now)
+        self.email_timestamps[email].append(now)
+        return True
+
+    def clear(self):
+        self.ip_timestamps.clear()
+        self.email_timestamps.clear()
+
+
+recovery_limiter = PasswordRecoveryRateLimiter()
+
+
+def hash_token(raw_token: str) -> str:
+    """Cryptographic SHA-256 hash of token to prevent plaintext storage in DB."""
+    return hashlib.sha256(raw_token.strip().encode("utf-8")).hexdigest()
+
+
+def validate_password_policy(password: str) -> None:
+    """Enforces strong password policy (min 8 chars, upper, lower, digit, special)."""
+    if len(password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters long.")
+    if not any(c.isupper() for c in password):
+        raise HTTPException(status_code=400, detail="Password must contain at least one uppercase letter.")
+    if not any(c.islower() for c in password):
+        raise HTTPException(status_code=400, detail="Password must contain at least one lowercase letter.")
+    if not any(c.isdigit() for c in password):
+        raise HTTPException(status_code=400, detail="Password must contain at least one number.")
+    special_chars = "!@#$%^&*()-_=+[]{}|;:,.<>?/~`"
+    if not any(c in special_chars for c in password):
+        raise HTTPException(status_code=400, detail="Password must contain at least one special character.")
+
+
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 
@@ -136,42 +198,80 @@ class ResetPasswordRequest(BaseModel):
 
 
 @router.post("/forgot-password")
-async def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == req.email.lower()).first()
-    reset_token_str = None
+async def forgot_password(req: ForgotPasswordRequest, request: Request, db: Session = Depends(get_db)):
+    """
+    Initiates password recovery.
+    Always returns identical generic response to prevent account enumeration.
+    Never exposes raw tokens in the response or logs.
+    """
+    client_ip = request.headers.get("X-Forwarded-For") or (request.client.host if request.client else "127.0.0.1")
+    if "," in client_ip:
+        client_ip = client_ip.split(",")[0].strip()
+
+    normalized_email = req.email.lower().strip()
+
+    # Rate limiting protection against flooding / brute force
+    if not recovery_limiter.check_and_record(client_ip, normalized_email):
+        logger.warning(f"Password reset rate limit exceeded for client")
+        raise HTTPException(
+            status_code=429,
+            detail="Too many password reset requests. Please wait a few minutes before trying again."
+        )
+
+    user = db.query(User).filter(User.email == normalized_email).first()
     if user:
-        # Invalidate any previous unexpired tokens
+        # Invalidate any previous active tokens for this user
         db.query(PasswordResetToken).filter(
             PasswordResetToken.user_id == user.id,
             PasswordResetToken.used == False
         ).update({"used": True})
 
-        token_value = secrets.token_urlsafe(32)
-        reset_token = PasswordResetToken(
-            user_id=user.id,
-            token=token_value,
-            used=False,
-            expires_at=datetime.utcnow() + timedelta(hours=1)
-        )
-        db.add(reset_token)
-        db.commit()
-        reset_token_str = token_value
-        logger.info(f"Generated password reset token for user {user.id}")
+        # Generate cryptographically secure random token
+        raw_token = secrets.token_urlsafe(32)
+        token_hash = hash_token(raw_token)
+        expires_at = datetime.utcnow() + timedelta(minutes=PASSWORD_RESET_TOKEN_EXPIRE_MINUTES)
 
-    resp = {"message": "If this email is registered, you will receive a reset link shortly."}
-    # Expose token in dev/test environment for automated verification
-    if reset_token_str and os.getenv("ENVIRONMENT", "").lower() != "production":
-        resp["reset_token"] = reset_token_str
-    return resp
+        reset_token_rec = PasswordResetToken(
+            user_id=user.id,
+            token=token_hash,  # Store only the SHA-256 hash in database
+            used=False,
+            expires_at=expires_at
+        )
+        db.add(reset_token_rec)
+        db.commit()
+
+        # Dispatch reset email
+        email_sent = email_service.send_password_reset_email(user.email, raw_token)
+        if not email_sent:
+            logger.error(f"Failed to dispatch password reset email for user {user.id}")
+
+        logger.info(f"Password reset initiated for user {user.id}")
+    else:
+        logger.info(f"Password reset requested for unregistered email")
+
+    # Generic response: Always return identical response whether email exists or not
+    return {
+        "status": "success",
+        "message": "If this email is registered, you will receive a reset link shortly."
+    }
 
 
 @router.post("/reset-password")
 async def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
-    if len(req.new_password) < 6:
-        raise HTTPException(status_code=400, detail="Password must be at least 6 characters long.")
+    """
+    Validates token hash, checks expiration, enforces password policy,
+    updates hashed password, and invalidates token.
+    """
+    if not req.token or not req.token.strip():
+        raise HTTPException(status_code=400, detail="Password reset token is required.")
+
+    # Enforce password policy
+    validate_password_policy(req.new_password)
+
+    token_hash = hash_token(req.token)
 
     token_record = db.query(PasswordResetToken).filter(
-        PasswordResetToken.token == req.token,
+        PasswordResetToken.token == token_hash,
         PasswordResetToken.used == False
     ).first()
 
@@ -190,7 +290,12 @@ async def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db
     user.hashed_password = hash_password(req.new_password)
     token_record.used = True
     db.commit()
-    return {"status": "success", "message": "Password successfully updated. You may now log in with your new password."}
+
+    logger.info(f"Password successfully reset for user {user.id}")
+    return {
+        "status": "success",
+        "message": "Password successfully updated. You may now log in with your new password."
+    }
 
 
 

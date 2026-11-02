@@ -20,6 +20,16 @@ services:
         generateValue: true
       - key: BILLING_WEBHOOK_SECRET
         generateValue: true
+      - key: BILLING_ENABLED
+        value: "false"
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRO_PRICE_ID
+        sync: false
+      - key: STRIPE_FOUNDER_PRICE_ID
+        sync: false
       - key: CHROMA_PATH
         value: /app/chroma_db
       - key: CORS_ORIGINS
